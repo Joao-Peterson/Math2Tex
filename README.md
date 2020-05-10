@@ -1,1 +1,1 @@
-"# Math2Tex" 
+Dedicado realização de decodificação de arquivos Mathcad prime 5 e a tradução via scripts para arquivos de Tex, dedicado a uso acadêmico para facilitar criação de formulações matemáticas para escrita de documentos.
