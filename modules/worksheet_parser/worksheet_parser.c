@@ -69,7 +69,7 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
     read_tag(file, pos, mytag, line_cursor);
 
      // se iniciar com operador é uma operação
-    if (atb_cmp(mytag, 0, "plus") | atb_cmp(mytag, 0, "minus") | atb_cmp(mytag, 0, "mult") | atb_cmp(mytag, 0, "div") | atb_cmp(mytag, 0, "pow") | atb_cmp(mytag, 0, "equal")|atb_cmp(mytag,0,"parens")|atb_cmp(mytag,0,"neg"))
+    if (atb_cmp(mytag, 0, "plus") | atb_cmp(mytag, 0, "minus") | atb_cmp(mytag, 0, "mult") | atb_cmp(mytag, 0, "div") | atb_cmp(mytag, 0, "pow") | atb_cmp(mytag, 0, "equal")|atb_cmp(mytag,0,"parens")|atb_cmp(mytag,0,"neg")|(atb_cmp(mytag,0,"limit")))
     {
         if (atb_cmp(mytag, 0, "plus"))
         { // verifica qual operador matemático e adiciona a expressão
@@ -381,6 +381,39 @@ int symEval_parser(char *file, int *pos, char *expression, int *line_cursor){
     return true;
 }
 
+//parser do tipo lambda
+int lambda_parser(char *file, int *pos, char *expression, int *line_cursor){
+    allocate(mytag,tag);
+    read_tag(file,pos,mytag,line_cursor);
+
+    while(!atb_cmp(mytag,0,"/lambda")){
+
+        if(atb_cmp(mytag,0,"boundVars")){
+
+            read_tag(file,pos,mytag,line_cursor);
+
+            while(!atb_cmp(mytag,0,"/boundVars")){
+
+                if(type_parser(file,pos,mytag,expression,line_cursor)!=true){
+                    return 0;
+                }
+
+                strcat(expression,","); // separador entre variaveis
+
+                read_tag(file,pos,mytag,line_cursor);
+            }
+        }else{
+            if(type_parser(file,pos,mytag,expression,line_cursor)!=true){
+                return error;
+            }
+        }
+
+        read_tag(file,pos,mytag,line_cursor);
+    }
+
+    return true;
+}
+
 //verifica o tipo, apply, id, real, etc. e aplica
 int type_parser(char *file, int *pos, tag *ref_tag, char *expression, int *line_cursor){
 
@@ -430,6 +463,12 @@ int type_parser(char *file, int *pos, tag *ref_tag, char *expression, int *line_
         log_to_console("tag","<symEval>",0,line_cursor);
         if(symEval_parser(file,pos,expression,line_cursor)!=true){
             log_to_console("error","Erro ao processar tag <symEval>",0,line_cursor);
+            return error;
+        }
+    }else if(atb_cmp(ref_tag,0,"lambda")){
+        log_to_console("tag","<lambda>",0,line_cursor);
+        if(lambda_parser(file,pos,expression,line_cursor)!=true){
+            log_to_console("error","Erro ao processar tag <lambda>",0,line_cursor);
             return error;
         }
     }else{
@@ -514,6 +553,11 @@ int math_parser(char *file, int *pos, char *expression, int result_ref, resultsL
             strdel_last(expression,1); // deletea ultima virgula posta
             strcat(expression,")"); // fecha expressão eval
 
+        }else if(atb_cmp(mytag,0,"resultFormat")){ // tag <resultFormat> com função desconhecida
+            read_tag(file,pos,mytag,line_cursor);
+            while(!atb_cmp(mytag,0,"/resultFormat")){
+                read_tag(file,pos,mytag,line_cursor);
+            }
         }else if(atb_cmp(mytag,0,"symEval")){ // casos do tipo type_parser
             if(type_parser(file, pos, mytag, expression, line_cursor)!=true){
                 return error;
@@ -659,26 +703,23 @@ int parse_worksheet_xml(char *file, int *pos, worksheets **worksheets_obj, resul
     worksheets *worksheets_tmp = NULL; // objeto a ser montado e devolvido
     read_tag(file, pos, mytag, line_cursor); // lê primeira tag
 
-    // fica verificando pela mesma tag
-    while(!atb_cmp(mytag, 0, "the_end")){
+    while(!atb_cmp(mytag, 0, "the_end")){ // verifica fim do arquivo
         //verifica se é a tag esperada
-        if(!atb_cmp(mytag,0,"worksheet")){ // verifica se é tipo worksheet
-            log_to_console("error","Tag <worksheet> esperada",0,line_cursor);
-            return error; 
+        if(atb_cmp(mytag,0,"worksheet")){ // verifica se é tipo worksheet
+            
+            log_to_console("tag","<worksheet>",tag_counter,line_cursor);
+            // processa a tag, myworksheet retorna com tag e regions embutida
+            if(parse_worksheet(file, pos, &myworksheet, mytag, resultlist_ref, line_cursor)!=true){ // chama parse para tag worksheet e verifica se foi feita com sucesso
+                return error;
+            }
+
+            // adiciona worksheet para lista worksheets
+            add_worksheet(&worksheets_tmp, myworksheet);
+
+            // lê para próxima iteração
+            tag_counter++;
         }
 
-        log_to_console("tag","<worksheet>",tag_counter,line_cursor); // deu boa
-
-        // processa a tag, myworksheet retorna com tag e regions embutida
-        if(parse_worksheet(file, pos, &myworksheet, mytag, resultlist_ref, line_cursor)!=true){ // chama parse para tag worksheet e verifica se foi feita com sucesso
-            return error;
-        }
-
-        // adiciona worksheet para lista worksheets
-        add_worksheet(&worksheets_tmp, myworksheet);
-
-        // lê para próxima iteração
-        tag_counter++;
         read_tag(file, pos, mytag, line_cursor); 
     }
     

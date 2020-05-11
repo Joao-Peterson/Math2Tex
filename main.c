@@ -51,7 +51,7 @@ int main(int argc, char **argv){
     }
     log_to_console("done","Arquivo results.xml lido com sucesso",0,&cursor);
 
-    myregion=get_region(worksheets_xml,0,0,10);
+    myregion=get_region(worksheets_xml,0,0,12);
     printf("Expressao [1]: %s - Tipo: %s\n",myregion.expression,myregion.type);
 
     // myregion=get_region(worksheets_xml,0,0,1);

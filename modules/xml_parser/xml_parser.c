@@ -33,6 +33,7 @@ char *read_asci(const char *path){
     fread(buf,sizeof(char),len,file); // lê para o buffer
     buf[len]='\0'; // introduz fechamento de string
 
+    fclose(file);
     return buf;
 }
 
@@ -107,7 +108,7 @@ void read_tag(char *file, int *pos, tag *mytag, int *line_cursor){ // recebe pon
         mytag->tag_arg[mytag->argq][word]='\0';
         //aponta para catactere depois de ">"
         (*pos)++;
-    }else if((file[*pos]<0)|(file[*pos]==13)|(file[*pos]=='\0')|(file[*pos]==3)){ // caracteres não válidos (<0), terminadores '\0' e especiais como (3) mas que estão ao final do arquivo 
+    }else if((file[*pos]==0)|(file[*pos]==13)|(file[*pos]=='\0')|(file[*pos]==3)){ // caracteres não válidos (<0), terminadores '\0' e especiais como (3) mas que estão ao final do arquivo 
         strcpy(mytag->tag_arg[mytag->argq],"the_end"); // determina fim do arquivo em *file
     }else{
         //tag de tipo valor
