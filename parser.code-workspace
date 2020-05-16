@@ -6,7 +6,9 @@
 	],
 	"settings": {
 		"files.associations": {
-			"type_traits": "c"
+			"type_traits": "c",
+			"worksheet_parser.h": "c",
+			"unistd.h": "c"
 		}
 	}
 }

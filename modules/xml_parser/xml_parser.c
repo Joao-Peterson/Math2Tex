@@ -115,7 +115,7 @@ void read_tag(char *file, int *pos, tag *mytag, int *line_cursor){ // recebe pon
         mytag->tag_type=TAG_TYPE_VALUE;
 
         //percorre enquanto lê
-        while((file[*pos]!=9)&(file[*pos]!='\n')&(file[*pos]!=' ')){
+        while((file[*pos]!=9)&(file[*pos]!='\n')&(file[*pos]!=' ')&(file[*pos]!='<')){
             if(file[*pos]=='\n'){ // conta linhas lidas
                 (*line_cursor)++;
             }

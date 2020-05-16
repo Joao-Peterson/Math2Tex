@@ -65,7 +65,6 @@ int parser_results_xml(char *file, int *pos, resultsList **resultslist_ref, int 
                     log_to_console("tag","<ml:result>",0,line_cursor);
                     strcpy(type_temp,"result");
                 }else if(mytag->tag_type==TAG_TYPE_VALUE){
-
                     strcpy(temp_vector[i],atb_get(mytag,0));
                     i++;
 

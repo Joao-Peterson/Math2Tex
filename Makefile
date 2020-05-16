@@ -14,9 +14,15 @@ MAIN_EXE = parser
 MAIN_APP = main
 MAIN_DIR = $(shell pwd)
 
+HEADERS_PATH =-Iinclude
+LIB_PATH = -L./libs
+
+LIBS =-lzip
+LIBS += 
+
 # Compilador
 CC = gcc
-CFLAGS = -g 
+CFLAGS = -g -std=c99 $(LIB_PATH) $(HEADERS_PATH) $(LIBS)
 
 # Modulos a serem compilados
 SOURCE_FILES = $(shell find -name "*.c") # lista arquivos .c
@@ -42,7 +48,7 @@ depend.d: $(SOURCE_FILES) #ATENÇÃO, PODE SER QUE DE PAU QUANDO SE INSERIREM NO
 #gravação
 
 build : depend.d $(OBJECT_FILES)
-	$(CC) $(OBJECT_FILES) -o $(MAIN_EXE)
+	$(CC) $(OBJECT_FILES) $(CFLAGS) -o $(MAIN_EXE)
 
 clear : 
 	$(shell rm -f $(OBJECT_FILES))
