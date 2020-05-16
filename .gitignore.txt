@@ -1,0 +1,7 @@
+test/
+
+*.d
+
+.vscode/
+
+*.code-workspace
