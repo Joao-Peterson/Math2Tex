@@ -15,6 +15,9 @@ struct st_tag{
 };
 typedef struct st_tag tag;
 
+//recorta string dentro de outra, fechando o espaço vazio
+void strcrop(char *string, const char* token);
+
 //delete ultimo caractere de uma string
 void strdel_last(char *string, int qtd);
 

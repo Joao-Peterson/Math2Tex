@@ -8,6 +8,21 @@
 #define true 0
 #define error 1
 
+//recorta string dentro de outra, fechando o espaço vazio
+void strcrop(char *string, const char* token){
+    char *token_begin = NULL;
+    char *token_end=NULL;
+    int token_len = strlen(token);
+
+    if((token_begin=strstr(string,token))==NULL){
+        return;
+    }
+
+    token_end=token_begin+token_len*sizeof(char);
+
+    strncpy(token_begin,token_end,TAG_ARG_LEN_DEFAULT);
+}
+
 //exclúi ultimo caractere de uma string
 void strdel_last(char *string, int qtd){
     int i=0;
@@ -39,6 +54,7 @@ char *read_asci(const char *path){
 
 //compara tag com string e retorna 1 ou 0
 int atb_cmp(tag *ref, int id, const char *str){
+    
     if(strcmp(ref->tag_arg[id],str)==0){
         return 1;
     }else{
@@ -75,6 +91,7 @@ void read_tag(char *file, int *pos, tag *mytag, int *line_cursor){ // recebe pon
     //zerar tag repassada
     mytag->argq=0;
     mytag->tag_type=TAG_TYPE_TAG;
+    char *buffer=NULL;
 
     //percorre até encontrar um caractere
     while((file[*pos]==9)|(file[*pos]=='\n')|(file[*pos]==' ')|(file[*pos]==-17)|(file[*pos]==-65)|(file[*pos]==-69)|(file[*pos]==32)){ // caracteres vazios
@@ -106,6 +123,10 @@ void read_tag(char *file, int *pos, tag *mytag, int *line_cursor){ // recebe pon
         }
         //terminador
         mytag->tag_arg[mytag->argq][word]='\0';
+        // verifica prefixos no nome da tag do tipo <ml:something> e muda para <something>, argq=0 indica o nome da tag
+        if(strstr(mytag->tag_arg[0],"ml:")!=NULL){ 
+            strcrop(mytag->tag_arg[0],"ml:");
+        }
         //aponta para catactere depois de ">"
         (*pos)++;
     }else if((file[*pos]==0)|(file[*pos]==13)|(file[*pos]=='\0')|(file[*pos]==3)){ // caracteres não válidos (<0), terminadores '\0' e especiais como (3) mas que estão ao final do arquivo 

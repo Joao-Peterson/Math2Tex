@@ -58,11 +58,11 @@ int parser_results_xml(char *file, int *pos, resultsList **resultslist_ref, int 
 
             while(!atb_cmp(mytag,0,"/resultData")){ // espera fechamento </resultData>
 
-                if(atb_cmp(mytag,0,"ml:Trace2dResult")){
-                    log_to_console("tag","<ml:Trace2dResult>",0,line_cursor);
+                if(atb_cmp(mytag,0,"Trace2dResult")){
+                    log_to_console("tag","<Trace2dResult>",0,line_cursor);
                     strcpy(type_temp,"2dplot");
-                }else if(atb_cmp(mytag,0,"ml:result")){
-                    log_to_console("tag","<ml:result>",0,line_cursor);
+                }else if(atb_cmp(mytag,0,"result")){
+                    log_to_console("tag","<result>",0,line_cursor);
                     strcpy(type_temp,"result");
                 }else if(mytag->tag_type==TAG_TYPE_VALUE){
                     strcpy(temp_vector[i],atb_get(mytag,0));
