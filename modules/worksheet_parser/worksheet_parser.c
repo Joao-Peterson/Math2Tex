@@ -8,6 +8,42 @@
 #define true 0
 #define error 1
 
+//parser de tags genéricas que, para o propósito deste programa, melhor serem ignoradas
+int parser_generic(char *file, int *pos, char *tag_name, char *expression, int *line_cursor){
+    char *tag_closing = (char*)malloc(sizeof(char)*(strlen(tag_name)+10));
+    tag_closing[0]='\0';
+    char *tag_brackets = (char*)malloc(sizeof(char)*(strlen(tag_name)+10));
+    tag_brackets[0]='\0';
+    strcat(tag_closing,"/");
+    strcat(tag_closing,tag_name);
+    strcat(tag_brackets,"<");
+    strcat(tag_brackets,tag_name);
+    strcat(tag_brackets,">");
+    log_to_console("tag",tag_brackets,0,line_cursor);
+    
+    allocate(mytag,tag);
+    read_tag(file,pos,mytag,line_cursor);
+
+    while(!atb_cmp(mytag,0,tag_closing)){
+
+        if(type_parser(file,pos,mytag,expression,line_cursor)!=true){
+            return error;
+        }
+
+        strcat(expression,",");
+        read_tag(file,pos,mytag,line_cursor);
+    }
+
+    tag_brackets[0]='\0';
+    strcat(tag_brackets,"</");
+    strcat(tag_brackets,tag_name);
+    strcat(tag_brackets,">");
+
+    log_to_console("/tag",tag_brackets,0,line_cursor);
+    strdel_last(expression,1);
+    return true;
+} 
+
 //parser de real
 int real_parser(char *file, int *pos, char *expression, int *line_cursor){
     allocate(mytag,tag);                
@@ -69,7 +105,7 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
     read_tag(file, pos, mytag, line_cursor);
 
      // se iniciar com operador é uma operação
-    if (atb_cmp(mytag, 0, "plus") | atb_cmp(mytag, 0, "minus") | atb_cmp(mytag, 0, "mult") | atb_cmp(mytag, 0, "div") | atb_cmp(mytag, 0, "pow") | atb_cmp(mytag, 0, "equal")|atb_cmp(mytag,0,"parens")|atb_cmp(mytag,0,"neg")|(atb_cmp(mytag,0,"limit")))
+    if (atb_cmp(mytag, 0, "plus") | atb_cmp(mytag, 0, "minus") | atb_cmp(mytag, 0, "mult") | atb_cmp(mytag, 0, "div") | atb_cmp(mytag, 0, "pow") | atb_cmp(mytag, 0, "equal")|atb_cmp(mytag,0,"parens")|atb_cmp(mytag,0,"neg")|atb_cmp(mytag,0,"limit")|atb_cmp(mytag,0,"derivative")|(atb_cmp(mytag,0,"integral")))
     {
         if (atb_cmp(mytag, 0, "plus"))
         { // verifica qual operador matemático e adiciona a expressão
@@ -116,7 +152,17 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
             strcat(expression,"lim(");
             log_to_console("tag","<limit>",0,line_cursor);
         }
-
+        else if (atb_cmp(mytag,0,"derivative"))
+        {
+            strcat(expression,"deri(");
+            log_to_console("tag","<derivative>",0,line_cursor);
+        }
+        else if (atb_cmp(mytag,0,"integral"))
+        {
+            strcat(expression,"int(");
+            log_to_console("tag","<integral>",0,line_cursor);
+        }
+        
         read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
     }
     else // se não, é uma aplicação da forma. EX. V(3).
@@ -298,6 +344,7 @@ int function_parser(char *file, int *pos, char *expression, int *line_cursor){
                 read_tag(file,pos,mytag,line_cursor);
             }
 
+            strdel_last(expression,1); // ultima virgula posta
             log_to_console("/tag","</boundVars>",0,line_cursor);
 
         }else{
@@ -340,7 +387,9 @@ int symEval_parser(char *file, int *pos, char *expression, int *line_cursor){
                 if(atb_cmp(mytag,0,"placeholder")){
                     strcat(expression," "); // coloca espaço caso não houver texto da operação de avaliação simbólica
                 }else{
-                    log_to_console("error","Há texto no operador de avaliacao simbolica, rever codigo",0,line_cursor);// chama função que funde os argumentos lidos;
+                    if(type_parser(file,pos,mytag,expression,line_cursor)!=true){
+                        return error;
+                    }
                 }
 
                 read_tag(file,pos,mytag,line_cursor);
@@ -471,8 +520,15 @@ int type_parser(char *file, int *pos, tag *ref_tag, char *expression, int *line_
             log_to_console("error","Erro ao processar tag <lambda>",0,line_cursor);
             return error;
         }
+    }else if(atb_cmp(ref_tag,0,"sequence") | atb_cmp(ref_tag,0,"upperBound") | atb_cmp(ref_tag,0,"lowerBound") | atb_cmp(ref_tag,0,"degree")){
+        if(parser_generic(file,pos,atb_get(ref_tag,0),expression,line_cursor)!=true){
+            return error;
+        }
+    }else if(atb_cmp(ref_tag,0,"placeholder")){
+        log_to_console("tag","<placeholder>",0,line_cursor);
+        strcat(expression," ");
     }else{
-        log_to_console("error","Tag inválida encontrada",0,line_cursor);
+        log_to_console("error","Tag invalida encontrada",0,line_cursor);
         log_to_console("tag?",atb_get(ref_tag,0),0,line_cursor);
         return error;
     }
@@ -558,13 +614,10 @@ int math_parser(char *file, int *pos, char *expression, int result_ref, resultsL
             while(!atb_cmp(mytag,0,"/resultFormat")){
                 read_tag(file,pos,mytag,line_cursor);
             }
-        }else if(atb_cmp(mytag,0,"symEval")){ // casos do tipo type_parser
+        }else{ // casos do tipo type_parser
             if(type_parser(file, pos, mytag, expression, line_cursor)!=true){
                 return error;
             }
-        }else{
-            log_to_console("error","Nenhuma tag valida encontrada dentro de <math>",0,line_cursor);
-            return error;
         }
          
         read_tag(file, pos, mytag, line_cursor);
