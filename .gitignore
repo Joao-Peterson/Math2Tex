@@ -5,3 +5,11 @@ test/
 .vscode/
 
 *.code-workspace
+
+*.exe
+
+*.o
+
+include/
+
+libs/

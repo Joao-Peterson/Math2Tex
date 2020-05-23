@@ -4,7 +4,7 @@
 #define TAG_TYPE_TAG 0
 #define TAG_TYPE_VALUE 1
 #define ATRIBUTE_LEN_DEFAULT 150
-#define TAG_QTDY_DEFAULT 50
+#define TAG_QTDY_DEFAULT 100
 #define TAG_ARG_LEN_DEFAULT 2000
 
 //estrutura de uma tag

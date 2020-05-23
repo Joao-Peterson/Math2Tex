@@ -65,6 +65,16 @@ struct st_resultsList{
 };
 typedef struct st_resultsList resultsList;
 
+struct st_text_field
+{
+    int id;
+    tag tags;
+    char *text;
+    struct st_text_field *next;
+};
+typedef struct st_text_field text_field;
+
+
 /*Listas------------------------------------------------------------------------*/
 
 void begin_worksheet_list(worksheets **myworksheets);
@@ -105,5 +115,15 @@ void add_result(resultsList **resultslist_ref, int id, char *type, plotdata *plo
 resultsList *read_result(resultsList **resultslist_ref, int id);
 
 float get_result(resultsList **resultslist_ref, int id);
+
+
+void begin_text_field(text_field **head);
+
+void add_text_field(text_field **head, int id, char *text, tag tags);
+
+char *get_text_field(text_field **head, int id);
+
+//run trought the list printing entries
+void print_text_field(text_field **head);
 
 #endif

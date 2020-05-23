@@ -258,3 +258,59 @@ float get_result(resultsList **resultslist_ref, int id){
     plotdata *data_address = read_plotdata(&data_head_addres,0); // endereço do primeiro valor
     return data_address->value1; // retorna valor da primeira posição
 }
+
+//initialize list by the head
+void begin_text_field(text_field **head){
+    if(*head==NULL)
+        return;
+
+    *head = (text_field*)malloc(sizeof(text_field));
+    (*head)->next=NULL;
+}
+
+//add a node a the last positions of the list
+void add_text_field(text_field **head, int id, char *text, tag tags){
+    text_field *cursor = *head;
+    allocate(entry,text_field);
+    
+    entry->id=id;
+    entry->tags=tags;
+    entry->text=text;
+    entry->next=NULL;
+
+    if(cursor==NULL){
+        *head = entry;
+        return;
+    }
+
+    while(cursor->next!=NULL){
+        cursor=cursor->next;
+    }
+
+    cursor->next=entry;
+}
+
+//get the text from the node that contains the right id
+char *get_text_field(text_field **head, int id){
+    text_field *cursor = *head;
+    
+    if(cursor==NULL){
+        return NULL;
+    }
+
+    while(cursor->id!=id){
+        cursor=cursor->next;
+    }
+
+    return cursor->text;
+}
+
+//run trought the list printing entries
+void print_text_field(text_field **head){
+    text_field *cursor = *head;
+    printf("!---------------Lista de textos----------------!\n");
+    while(cursor!=NULL){
+        printf("ID: %i , TEXTO: %s\n",cursor->id,cursor->text);
+        cursor=cursor->next;
+    }
+}

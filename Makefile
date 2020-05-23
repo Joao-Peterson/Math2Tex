@@ -22,7 +22,8 @@ LIBS +=
 
 # Compilador
 CC = gcc
-CFLAGS = -g -std=c99 $(LIB_PATH) $(HEADERS_PATH) $(LIBS)
+CFLAGS = -g -std=c99 $(HEADERS_PATH)
+LFLAGS = $(LIB_PATH) $(LIBS)
 
 # Modulos a serem compilados
 SOURCE_FILES = $(shell find -name "*.c") # lista arquivos .c
@@ -48,7 +49,7 @@ depend.d: $(SOURCE_FILES) #ATENÇÃO, PODE SER QUE DE PAU QUANDO SE INSERIREM NO
 #gravação
 
 build : depend.d $(OBJECT_FILES)
-	$(CC) $(OBJECT_FILES) $(CFLAGS) -o $(MAIN_EXE)
+	$(CC) $(OBJECT_FILES) $(LFLAGS) -o $(MAIN_EXE)
 
 clear : 
 	$(shell rm -f $(OBJECT_FILES))
