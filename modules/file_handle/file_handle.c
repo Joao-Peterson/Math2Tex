@@ -48,3 +48,34 @@ void ld_dir(DIR *handle){
     rewinddir(handle);
     return;
 }
+
+void rm_dir(char *filename){
+    DIR *handle = opendir(filename);
+    if (handle==NULL)
+        return;
+    
+    struct dirent *entry = NULL;
+    size_t path_len = strlen(filename);
+    size_t len;
+    char *rel_path;
+
+    while((entry=readdir(handle))!=NULL){
+        if((strcmp(entry->d_name,".")!=0)&(strcmp(entry->d_name,"..")!=0)){
+            
+            len = path_len + strlen(entry->d_name) + 2; // 2 = '/' and '\0' , the two '\0' of both strings were not counted
+            rel_path = (char*)malloc(len);
+            snprintf(rel_path,len,"%s/%s",filename,entry->d_name);
+
+            if(entry->d_type==DT_DIR){
+                rm_dir(rel_path);
+                free(rel_path);
+            }else{
+                unlink(rel_path);
+            }
+        }
+    }
+
+    rmdir(filename);
+    closedir(handle);
+    return;
+}

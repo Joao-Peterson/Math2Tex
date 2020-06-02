@@ -17,21 +17,21 @@
 
 int main(int argc, char **argv){
     
-    /* Argumentos do executavel */  
+    /* Arguments */  
     if(argc!=2){
         printf("Sintaxe incorreta!");
         return 0;
     }
 
-    /* Unzip arquivo mathcad*/
-    char *unziped_path = filename_to_folder(argv[1]); // path principal para arquivo mathcad descompactado
-    zip_extract(argv[1], unziped_path, on_extract_entry, NULL); // extraí
+    /* Unpack mathcad file */
+    char *unziped_path = filename_to_folder(argv[1]); // path to unpacked folder os specified file
+    rm_dir(unziped_path); // del last unpacked folder if it exist
+    zip_extract(argv[1], unziped_path, on_extract_entry, NULL); // unpack
     
     /* Descobrindo arquivos internos*/
     char worksheet_path[200]={0};
     char result_path[200]={0};
     char xaml_path[200]={0};
-    char buffer[200]={0};
     DIR *handle = opendir(unziped_path);
     struct dirent *entry;
     chdir(unziped_path); // vai para path de interesse
@@ -63,35 +63,37 @@ int main(int argc, char **argv){
 
     print_text_field(&text_list);
 
-    // /* Leitura e parser de arquivos */    
-    // char *input = read_asci(result_path);
-    // if(input==NULL){
-    //     return 0;
-    // }
+    /* Leitura e parser de arquivos */    
+    char *input = read_asci(result_path);
+    if(input==NULL){
+        return 0;
+    }
     
-    // if(parser_results_xml(input,&pos,&result_xml, &cursor)!=true){
-    //     return 0;
-    //     log_to_console("error","Erro ao fazer parser",0,&cursor);
-    // }
-    // log_to_console("done","Arquivo results.xml lido com sucesso",0,&cursor);
+    if(parser_results_xml(input,&pos,&result_xml, &cursor)!=true){
+        return 0;
+        log_to_console("error","Erro ao fazer parser",0,&cursor);
+    }
+    log_to_console("done","Arquivo results.xml lido com sucesso",0,&cursor);
 
-    // input = NULL;
-    // pos=0;
-    // cursor=1;
-    // input = read_asci(worksheet_path);
-    // if(input==NULL){
-    //     return 0;
-    // }
+    input = NULL;
+    pos=0;
+    cursor=1;
+    input = read_asci(worksheet_path);
+    if(input==NULL){
+        return 0;
+    }
 
-    // if(parse_worksheet_xml(input, &pos, &worksheets_xml, &result_xml, &cursor)!=true){
-    //     return 0;
-    // }
-    // log_to_console("done","Arquivo worskheet.xml lido com sucesso",0,&cursor);
+    if(parse_worksheet_xml(input, &pos, &worksheets_xml, &text_list, &result_xml, &cursor)!=true){
+        return 0;
+    }
+    log_to_console("done","Arquivo worskheet.xml lido com sucesso",0,&cursor);
 
-    // for(int i=0;i<9;i++){
-    //     myregion = get_region(worksheets_xml,0,0,i);
-    //     printf("Expressao [%d]: %s - Tipo: %s\n",i,myregion.expression,myregion.type);
-    // }
+    for(int i=0;i<=24;i++){
+        myregion = get_region(worksheets_xml,0,0,i);
+        if (myregion.region_id == -1) // in case of non existing id
+            continue;
+        printf("Expressao [%d]: %s - Tipo: %s\n",i,myregion.expression,myregion.type);
+    }
 
     return 0;
 }

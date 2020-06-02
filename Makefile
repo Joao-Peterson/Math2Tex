@@ -1,4 +1,4 @@
-# Projeto: Balizar
+# Projeto: Parser
 # Author: João peterson 
 # Data de criação: 24.04.2020
 # Ultima data de modificação: 24.04.2020 
@@ -11,8 +11,6 @@
 
 # Programa principal e diretórios
 MAIN_EXE = parser
-MAIN_APP = main
-MAIN_DIR = $(shell pwd)
 
 HEADERS_PATH =-Iinclude
 LIB_PATH = -L./libs

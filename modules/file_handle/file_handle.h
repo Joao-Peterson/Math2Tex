@@ -15,4 +15,7 @@ void cd_to(DIR **handle, const char *filename);
 // list the contents of the directory pointed by the handle
 void ld_dir(DIR *handle);
 
+// remove a entry within a directory. Be careful to "cd" to the parent directory first
+void rm_dir(char *filename);
+
 #endif

@@ -10,8 +10,16 @@
 #include "../file_handle/file_handle.h"
 #include <dirent.h>
 
+#define TEXT_PLACE_HOLDER "<Run>" // placeholder used in text to mark math-region expressions
+
 //called when reading a <Paragraph>, concatenates text to expression
 int paragraph_parser(char *file, int *pos, char *expression, int *line_cursor);
+
+//called when reading a indexed list, concatenates reading to expression, type is the symbol image for indexing
+int list_parser(char *file, int *pos, char *type, char *expression, int *line_cursor);
+
+//generic caller to handle all other specific tag calls
+int text_format(char *file, int *pos, tag *tag_ref, char *expression, int *line_cursor);
 
 //called on a Document.xaml, write node to text_field list
 int document_parser(char *filename, int id, text_field **head);

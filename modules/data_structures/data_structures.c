@@ -136,20 +136,29 @@ regions *read_region(regions **regions_ref, int id){
     }
     free(node); // libera espaço não utilizado em caso de ponterio inválido, como acima
 
-    while(id>0){ // percorre até chegar em id
+    while(regions_temp!=NULL){ // percorre até chegar em id
+        if(id==regions_temp->region_data->region_id){
+            node=regions_temp; // recebe endereço 
+            return node; // retorna dados
+        }
+
         regions_temp=regions_temp->next;
-        id--;
     }
 
-    node=regions_temp; // recebe endereço 
-    return node; // retorna dados
+    return NULL;
 }
 
 //retorna objeto region de uma lista regions de uma lista worksheets
 region get_region(worksheets *xml, int worksheet_id, int regions_id, int region_id){
+    allocate(node, region);
     worksheets *myworksheet = read_worksheet(&xml,worksheet_id); // retorna endereço de um nó worksheets que contém um worksheet 
     worksheet *myregions = read_regions(&(myworksheet->worksheet_data),regions_id); // retorna endereço de um nó worksheet que contém um regions 
     regions *myregion = read_region(&(myregions->regions_data), region_id); // retorna endereço de um nó regions que contém um region
+    if (myregion==NULL){
+        node->region_id=-1; // to indicate failure
+        return *node;
+    }
+    free(node);
     return *(myregion->region_data); // retorna objeto region
 }
 

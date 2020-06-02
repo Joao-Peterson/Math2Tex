@@ -1,4 +1,5 @@
 #include "worksheet_parser.h"
+#include "../xaml_parser/xaml_parser.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -627,8 +628,51 @@ int math_parser(char *file, int *pos, char *expression, int result_ref, resultsL
     return true;
 }
 
+//text parser
+int text_parser(char *file, int *pos, char *expression, int result_ref, text_field **text_list, resultsList **resultslist_ref, int *line_cursor){
+    allocate(mytag,tag);
+    regions *myregions = NULL;
+
+    read_tag(file,pos,mytag,line_cursor);
+    while(!atb_cmp(mytag,0,"/text")){
+
+        if(atb_cmp(mytag,0,"regions")){
+            if(parse_regions(file,pos,&myregions,mytag,text_list, resultslist_ref,line_cursor)!=true){
+                log_to_console("error","Erro ao processar tag <regions>",0,line_cursor);
+                return error;
+            }
+        }
+
+        read_tag(file,pos,mytag,line_cursor);
+    }
+
+    char *raw_text = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT); // raw text from xaml parser
+    char *buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT); 
+    strncpy(raw_text,get_text_field(text_list, result_ref),REGION_EXPRESSION_LEN_DEFAULT);
+    int placeholder_offset = strlen(TEXT_PLACE_HOLDER)*sizeof(char); // lenght of placeholder
+    char *token_start;
+    char *token_end;
+
+    regions *cursor = myregions;
+    while(cursor!=NULL){  // substitute placeholders
+        token_start = strstr(raw_text,TEXT_PLACE_HOLDER);
+        token_end = token_start + placeholder_offset;
+        strncpy(buffer,token_end,strlen(token_end)+1); // save string after the token, +1 to acomodate the '\0' at the end 
+        strncpy(token_start,cursor->region_data->expression,strlen(cursor->region_data->expression)+1); // substitute de place holder
+        strcat(token_start,buffer); // bring back the rest 
+
+        cursor=cursor->next;
+    }
+
+    strncpy(expression,raw_text,strlen(raw_text)+1); // pass to the main expression
+    free(buffer);
+    free(raw_text);
+
+    return true;
+}
+
 //parser de region
-int parse_region(char *file, int *pos, region **region_obj, tag *header, resultsList **resultlist_ref, int *line_cursor){
+int parse_region(char *file, int *pos, region **region_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
     allocate(mytag,tag);
     allocate(myregion,region); // objeto a ser montado e devolvido
     read_tag(file, pos, mytag, line_cursor);
@@ -637,28 +681,32 @@ int parse_region(char *file, int *pos, region **region_obj, tag *header, results
     myregion->region_id=atoi(atb_read_value(myregion->tags.tag_arg[1])); // parametro "region_id" recebe inteiro da string que é valor do atributo de numero "1" correpondente ao atributo "region-id" da tag <region>
     myregion->size[0]=strtof(atb_read_value(myregion->tags.tag_arg[2]),NULL); // lê largura da tag
     myregion->size[1]=strtof(atb_read_value(myregion->tags.tag_arg[3]),NULL); // lê altura da tag
-    myregion->pos[0]=strtof(atb_read_value(myregion->tags.tag_arg[4]),NULL); // parametro pos[top] recebe string para float do valor do argumento da tag <region> "top", 4 da lista de argumentos
-    myregion->pos[1]=strtof(atb_read_value(myregion->tags.tag_arg[5]),NULL); // parametro pos[left] recebe string para float do valor do argumento da tag <region> "leaft", 5 da lista de argumentos
+    if(myregion->tags.argq>=5){
+        myregion->pos[0]=strtof(atb_read_value(myregion->tags.tag_arg[4]),NULL); // parametro pos[top] recebe string para float do valor do argumento da tag <region> "top", 4 da lista de argumentos
+        myregion->pos[1]=strtof(atb_read_value(myregion->tags.tag_arg[5]),NULL); // parametro pos[left] recebe string para float do valor do argumento da tag <region> "leaft", 5 da lista de argumentos
+    }
+    myregion->expression[0]='\0';
 
-
-    while(!atb_cmp(mytag, 0, "/region")){ // espera tag de fechamento 
-        if(strcmp(mytag->tag_arg[0],"math")==true){ // tipo math
+    while(!atb_cmp(mytag, 0, "/region")){
+        if(strcmp(mytag->tag_arg[0],"math")==true){ // math tag
             log_to_console("tag","<math>",0,line_cursor);
 
-            strcpy(myregion->type,"math"); // essa é uma tag math afinal
-            myregion->resultRef = atoi(atb_read_value(atb_get(mytag,1))); // lê valor de referência de cálculo da região, string para inteiro do valor do atributo "resultRef" da tag <math> que tem valor 1 na lista de argumentos
-            int result_ref = atoi(atb_read_value(atb_get(mytag,1))); // pega referência de resultado para tag <eval> em <math>
-            //processa tag
-            if(math_parser(file, pos, (char*)&myregion->expression, result_ref, resultlist_ref, line_cursor)!=true){
+            strcpy(myregion->type,"math"); // save type
+            myregion->resultRef = atoi(atb_read_value(atb_get(mytag,1))); // picks the "resultRef" id from <math> for evaluation crossreference 
+            
+            if(math_parser(file, pos, (char*)&myregion->expression, myregion->resultRef, resultlist_ref, line_cursor)!=true){
                 log_to_console("error","Erro ao processar tag <math>",myregion->region_id,line_cursor);
                 return error;
             }
-        }else if(strcmp(mytag->tag_arg[0],"text")==true){ // tipo text
-            //ESCREVER
-            log_to_console("Missing","Escrever text parser",0,line_cursor);
-            read_tag(file, pos, mytag, line_cursor);
-            while(!atb_cmp(mytag,0,"/text")){
-                read_tag(file, pos, mytag, line_cursor);
+        }else if(strcmp(mytag->tag_arg[0],"text")==true){ // text tag
+            log_to_console("tag","<text>",0,line_cursor);
+
+            strcpy(myregion->type,"text"); // save type
+            myregion->resultRef = atoi(atb_read_value(atb_get(header,1))); // pick the <region> caller "region-id", necessary to crossreference with xaml text
+            
+            if(text_parser(file, pos, (char*)&myregion->expression, myregion->resultRef, text_list, resultlist_ref, line_cursor)!=true){
+                log_to_console("error","Erro ao processar tag <text>",myregion->region_id,line_cursor);
+                return error;
             }
         }else if(strcmp(mytag->tag_arg[0],"plot")==true){ // tipo plot
             //ESCREVER
@@ -681,7 +729,7 @@ int parse_region(char *file, int *pos, region **region_obj, tag *header, results
 }
 
 //parser de regions
-int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, resultsList **resultlist_ref, int *line_cursor){
+int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
     int tag_counter=0;
     allocate(mytag,tag);// tag temporária
     region *myregion; // objeto a ser processado
@@ -696,7 +744,7 @@ int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, resu
 
         log_to_console("tag","<region>",tag_counter,line_cursor);
 
-        if(parse_region(file, pos, &myregion, mytag, resultlist_ref, line_cursor)!=true){
+        if(parse_region(file, pos, &myregion, mytag, text_list, resultlist_ref, line_cursor)!=true){
             return error;
         }
         
@@ -714,7 +762,7 @@ int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, resu
 }
 
 //parser de worksheet.xml , regiões de expressões e avaliações, mas não cálculos numéricos
-int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header, resultsList **resultlist_ref, int *line_cursor){
+int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
     int tag_counter; //contador de tags
     allocate(mytag,tag); // tag temporária
     regions *myregions; // objeto a ser processado, ponteiro para cabeça da lista regions
@@ -730,7 +778,7 @@ int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header
         log_to_console("tag","<regions>",tag_counter,line_cursor); // deu boa
         
         myregions=NULL;
-        if(parse_regions(file, pos, &myregions, mytag, resultlist_ref, line_cursor)!=true){ // realizar parse da regions e verificar se deu boa ou não
+        if(parse_regions(file, pos, &myregions, mytag, text_list, resultlist_ref, line_cursor)!=true){ // realizar parse da regions e verificar se deu boa ou não
             return error;
         }
         
@@ -749,7 +797,7 @@ int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header
 }
 
 //parse do arquivo worksheet.xml
-int parse_worksheet_xml(char *file, int *pos, worksheets **worksheets_obj, resultsList **resultlist_ref, int *line_cursor){
+int parse_worksheet_xml(char *file, int *pos, worksheets **worksheets_obj, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
     int tag_counter=0; // contador de tags
     allocate(mytag,tag);
     worksheet *myworksheet; // cria worksheet para ser armazenada posteriormente
@@ -762,7 +810,7 @@ int parse_worksheet_xml(char *file, int *pos, worksheets **worksheets_obj, resul
             
             log_to_console("tag","<worksheet>",tag_counter,line_cursor);
             // processa a tag, myworksheet retorna com tag e regions embutida
-            if(parse_worksheet(file, pos, &myworksheet, mytag, resultlist_ref, line_cursor)!=true){ // chama parse para tag worksheet e verifica se foi feita com sucesso
+            if(parse_worksheet(file, pos, &myworksheet, mytag, text_list, resultlist_ref, line_cursor)!=true){ // chama parse para tag worksheet e verifica se foi feita com sucesso
                 return error;
             }
 
