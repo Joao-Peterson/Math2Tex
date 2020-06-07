@@ -13,7 +13,6 @@ void strcrop(char *string, const char* token){
     char *token_begin = NULL;
     char *token_end=NULL;
     int token_len = strlen(token);
-    int maxlen = strlen(string);
 
     if((token_begin=strstr(string,token))==NULL){
         return;
@@ -21,7 +20,7 @@ void strcrop(char *string, const char* token){
 
     token_end=token_begin+token_len*sizeof(char);
 
-    strncpy(token_begin,token_end,maxlen);
+    strncpy(token_begin,token_end,strlen(token_end)+1);
 }
 
 //exclúi ultimo caractere de uma string

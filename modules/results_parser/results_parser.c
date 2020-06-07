@@ -34,10 +34,11 @@ void stringdata2floatarray(char* expression1, char* expression2, char* expressio
     }
 }
 
-int parser_results_xml(char *file, int *pos, resultsList **resultslist_ref, int *line_cursor){
+resultsList *parser_results_xml(char *file, int *pos, int *line_cursor){
     allocate(mytag,tag);
     //variaveis para futuro result
     plotdata *node = NULL;
+    resultsList *resultslist_ref=NULL;
     int id_temp;
     char type_temp[25];
     float value_temp;
@@ -76,15 +77,15 @@ int parser_results_xml(char *file, int *pos, resultsList **resultslist_ref, int 
             i=0; // zera contagem de strings de valores lidos
             node=NULL; // null a cada conversão para forçar alocação mais adiante
             stringdata2floatarray(temp_vector[0],temp_vector[1],temp_vector[2],&node); // converte e retorna vetor de floats organizado
-            add_result(resultslist_ref,id_temp,type_temp,node);
+            add_result(&resultslist_ref,id_temp,type_temp,node);
 
         }else{
             id_temp=atoi(atb_read_value(atb_get(mytag,1))); // retorna inteiro de string que é valor do segundo argumento da tag, o result-id="N"
-            add_result(resultslist_ref,id_temp,"empty",NULL);
+            add_result(&resultslist_ref,id_temp,"empty",NULL);
         }
         
         read_tag(file,pos,mytag,line_cursor);
     }
 
-    return true;
+    return resultslist_ref;
 }

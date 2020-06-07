@@ -1,13 +1,11 @@
 # Projeto: Parser
 # Author: João peterson 
 # Data de criação: 24.04.2020
-# Ultima data de modificação: 24.04.2020 
+# Ultima data de modificação: 03.06.2020 
 # 
 # Comandos:
-# - Compilar e gravar: make 
-# - Compilar .hex: make build 
-# - Gravar apenas: make burn
-# - Gerar dependencias: make depend
+# - Compilar .exe: make build 
+# - Limpar arquivos compilados: make clear
 
 # Programa principal e diretórios
 MAIN_EXE = parser
@@ -15,8 +13,8 @@ MAIN_EXE = parser
 HEADERS_PATH =-Iinclude
 LIB_PATH = -L./libs
 
-LIBS =-lzip
-LIBS += 
+LIBS = ./libs/libzip.a
+LIBS += ./libs/lua53.dll
 
 # Compilador
 CC = gcc
@@ -37,16 +35,7 @@ BuildTask_default : build
 
 .PHONY : clear clearall
 
-#Geração de depêndencias
-depend.d: $(SOURCE_FILES) #ATENÇÃO, PODE SER QUE DE PAU QUANDO SE INSERIREM NOVOS MÓDULOS, USAR "make depend.d" APÓS INSERIR NOVO MODULO SÓ PARA GARANTIR
-	@echo $(SOURCE_FILES)
-	@echo $(OBJECT_FILES)
-	$(CC) -MM $(SOURCE_FILES) > $@
-
--include depend.d
-#gravação
-
-build : depend.d $(OBJECT_FILES)
+build : $(OBJECT_FILES)
 	$(CC) $(OBJECT_FILES) $(LFLAGS) -o $(MAIN_EXE)
 
 clear : 

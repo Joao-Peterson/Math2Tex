@@ -1,5 +1,6 @@
 #include "worksheet_parser.h"
 #include "../xaml_parser/xaml_parser.h"
+#include "../../include/types_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,7 +57,9 @@ int real_parser(char *file, int *pos, char *expression, int *line_cursor){
             return error;
         }
 
+        strcat(expression,"\"");
         strcat(expression, atb_get(mytag,0)); // concatena na expressão o valor real lido
+        strcat(expression,"\"");
                          
         read_tag(file, pos, mytag, line_cursor);
     }
@@ -245,7 +248,9 @@ int id_parser(char *file, int *pos, char *expression, int *line_cursor){
 
     while(!atb_cmp(mytag,0,"/id")){ // espera tag de fechamento
         if(mytag->tag_type==TAG_TYPE_VALUE){ // se inicia com variavel(value), guardar ele
-            strcat(expression,atb_get(mytag,0)); // copia para buffer
+            strcat(expression, "leg(\"");
+            strcat(expression,atb_get(mytag,0)); // copia variavel
+            strcat(expression, "\",\" \",\" \")");
         }else if(atb_cmp(mytag, 0, "Span")){ // senão, então esperamos uma tag <Span> que contem a variavel
             log_to_console("tag","<Span>",0,line_cursor);
               // necessário a cada leitura
@@ -294,13 +299,13 @@ int id_parser(char *file, int *pos, char *expression, int *line_cursor){
                     }
                 }
 
-                strcat(expression, "leg("); // adiciona legenda a expressão
+                strcat(expression, "leg(\""); // adiciona legenda a expressão
                 strcat(expression, var); // adiciona variavel
-                strcat(expression, ","); // separação virgula
+                strcat(expression, "\",\""); // separação virgula
                 strcat(expression, subs); // adiciona variavel
-                strcat(expression, ","); // separação virgula
+                strcat(expression, "\",\""); // separação virgula
                 strcat(expression, upper); // adiciona variavel
-                strcat(expression, ")"); // fecha legenda
+                strcat(expression, "\")"); // fecha legenda
 
                  
                 read_tag(file, pos, mytag, line_cursor);
@@ -386,7 +391,7 @@ int symEval_parser(char *file, int *pos, char *expression, int *line_cursor){
             while(!atb_cmp(mytag,0,"/command")){
                 
                 if(atb_cmp(mytag,0,"placeholder")){
-                    strcat(expression," "); // coloca espaço caso não houver texto da operação de avaliação simbólica
+                    strcat(expression,EMPTY_ARG); // coloca espaço caso não houver texto da operação de avaliação simbólica
                 }else{
                     if(type_parser(file,pos,mytag,expression,line_cursor)!=true){
                         return error;
@@ -527,7 +532,7 @@ int type_parser(char *file, int *pos, tag *ref_tag, char *expression, int *line_
         }
     }else if(atb_cmp(ref_tag,0,"placeholder")){
         log_to_console("tag","<placeholder>",0,line_cursor);
-        strcat(expression," ");
+        strcat(expression,EMPTY_ARG);
     }else{
         log_to_console("error","Tag invalida encontrada",0,line_cursor);
         log_to_console("tag?",atb_get(ref_tag,0),0,line_cursor);
@@ -587,7 +592,7 @@ int math_parser(char *file, int *pos, char *expression, int result_ref, resultsL
                         
                         if(atb_cmp(mytag,0,"placeholder")){ // resolve a tag para o valor correto
                             evaluation_result = get_result(resultlist_ref,result_ref); // pega valor
-                            sprintf(evaluation_result_string,"%.15f",evaluation_result); // faz para string
+                            sprintf(evaluation_result_string,"\"%.15f\"",evaluation_result); // faz para string
                             strcat(expression,evaluation_result_string); // concatena valor
                         }
 
@@ -797,7 +802,7 @@ int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header
 }
 
 //parse do arquivo worksheet.xml
-int parse_worksheet_xml(char *file, int *pos, worksheets **worksheets_obj, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
+worksheets *parse_worksheet_xml(char *file, int *pos, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
     int tag_counter=0; // contador de tags
     allocate(mytag,tag);
     worksheet *myworksheet; // cria worksheet para ser armazenada posteriormente
@@ -811,7 +816,7 @@ int parse_worksheet_xml(char *file, int *pos, worksheets **worksheets_obj, text_
             log_to_console("tag","<worksheet>",tag_counter,line_cursor);
             // processa a tag, myworksheet retorna com tag e regions embutida
             if(parse_worksheet(file, pos, &myworksheet, mytag, text_list, resultlist_ref, line_cursor)!=true){ // chama parse para tag worksheet e verifica se foi feita com sucesso
-                return error;
+                return NULL;
             }
 
             // adiciona worksheet para lista worksheets
@@ -824,6 +829,5 @@ int parse_worksheet_xml(char *file, int *pos, worksheets **worksheets_obj, text_
         read_tag(file, pos, mytag, line_cursor); 
     }
     
-    *worksheets_obj=worksheets_tmp; // recebe ponteiro de novo
-    return true;
+    return worksheets_tmp; // recebe ponteiro de novo
 }

@@ -12,10 +12,13 @@
 
 int paragraph_parser(char *file, int *pos, char *expression, int *line_cursor){
     allocate(mytag,tag);
+    char *buffer = (char*)malloc(REGION_EXPRESSION_LEN_DEFAULT/10);
+    buffer[0]='\0';
     read_tag(file,pos,mytag,line_cursor);
     log_to_console("tag","Paragraph",0,line_cursor);
     int placeholder; // flag tags where there's supposed to be a future math field expression, 1 for present, 0 for non necessary
 
+    strcat(expression,"para(");
     while(!atb_cmp(mytag,0,"/Paragraph")){
 
         if(atb_cmp(mytag,0,"Run")){
@@ -25,20 +28,34 @@ int paragraph_parser(char *file, int *pos, char *expression, int *line_cursor){
             while(!atb_cmp(mytag,0,"/Run")){
                 placeholder=0;
 
-                if(mytag->tag_type==TAG_TYPE_VALUE)
-                    strcat(expression,atb_get(mytag,0));    
+                if(mytag->tag_type==TAG_TYPE_VALUE){
+                    strcat(buffer,atb_get(mytag,0)); // cat every word of a <Run> tag
+                    strcat(buffer," ");
+                }
 
                 read_tag(file,pos,mytag,line_cursor);
             }
 
+            strdel_last(buffer,1); // del last " " space added above
+
             if(placeholder==1){
                 strcat(expression,TEXT_PLACE_HOLDER); // cat a placeholder 
+            }else{
+                strcat(expression,"\""); // to pass the expression as string to the lua script
+                strcat(expression,buffer);
+                strcat(expression,"\"");
             }
         }
 
+        buffer[0]='\0'; // clean buffer
+        strcat(expression,","); // separate 
         read_tag(file,pos,mytag,line_cursor);
     }
-    
+   
+    strdel_last(expression,1); // del last comma
+    strcat(expression,")"); // separation between paragraphs
+
+    free(buffer);
     log_to_console("/tag","/Paragraph",0,line_cursor);
 
     return true;
@@ -86,6 +103,9 @@ int text_format(char *file, int *pos, tag *tag_ref, char *expression, int *line_
             log_to_console("error","Error ao ler tag <List>",0,line_cursor);            
             return error;
         }
+    }else{
+        log_to_console("error","Tag inválida encontrada",0,line_cursor);
+        log_to_console("tag?",atb_get(tag_ref,0),0,line_cursor);
     }
 
     return true;
@@ -105,6 +125,8 @@ int document_parser(char *filename, int id, text_field **head){
     char *expression = (char*)malloc(sizeof(char)*TEXT_FIELD_MAX_CHR);
     expression[0]='\0';
 
+    strcat(expression,"text(");
+
     log_to_console("File",filename,0,&line_cursor);
 
     read_tag(file,&pos,mytag,&line_cursor);
@@ -123,13 +145,13 @@ int document_parser(char *filename, int id, text_field **head){
         if(text_format(file, &pos, mytag, expression, &line_cursor)){ // call generic tag handler for .xaml            
             return error;
         }
-
-        strcat(expression,"\n"); // separation between paragraphs
-
+        
+        strcat(expression,","); // comma separator
         read_tag(file,&pos,mytag,&line_cursor);
     }
 
-    strdel_last(expression,1); // delete last separation
+    strdel_last(expression,1); // del last comma
+    strcat(expression,")");
     add_text_field(head, id, expression, tag_temp); // add node 
     log_to_console("File","Documento lido com sucesso!",0,&line_cursor);
     return true;
@@ -144,8 +166,8 @@ text_field *extract_docs(DIR *handle){ //expects the xaml dir containing the pac
     text_field *head = NULL;
 
     while((entry=readdir(handle))!=NULL){ // read all the xaml directory 
-        strncpy(entry_name,"xaml/",REL_PATH_LEN_MAX); 
-        strncpy(entry_name_id,"xaml/",REL_PATH_LEN_MAX); // fixes the path to be relative to mathcad dir
+        strncpy(entry_name,"mathcad/xaml/",REL_PATH_LEN_MAX); 
+        strncpy(entry_name_id,"mathcad/xaml/",REL_PATH_LEN_MAX); // fixes the path to be relative to mathcad dir
         strcat(entry_name,entry->d_name);
         strcat(entry_name_id,entry->d_name); // copy the name two times
         printf(">> %s\n",entry_name);
@@ -156,7 +178,7 @@ text_field *extract_docs(DIR *handle){ //expects the xaml dir containing the pac
             zip_extract(entry_name, entry_name_id, on_extract_entry, NULL); // extract
 
             strcrop(entry_name_id,"FlowDocument"); // cut the prefix
-            strcrop(entry_name_id,"xaml/");
+            strcrop(entry_name_id,"mathcad/xaml/");
             id=atoi(entry_name_id); // pick the id
 
             strcrop(entry_name,".XamlPackage"); // cut the file extension

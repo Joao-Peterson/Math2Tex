@@ -11,7 +11,10 @@ mul;
 div;
 pow;
 sqrt;
+root;
+ln;
 log;
+logx;
 
 deri;
 pderi;
@@ -27,4 +30,5 @@ neg;
 leg; ;leg(V,s,u)
 paren;
 
-apply(apply,id,real,paren,neg)
+text; // text type
+para; // paragrapher

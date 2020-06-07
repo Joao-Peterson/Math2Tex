@@ -53,6 +53,6 @@ int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, text
 int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, int *line_cursor);
 
 //recebe arquivo vetor, pos para começar, inicio da lista a ser guardado após processar e endereço de linha
-int parse_worksheet_xml(char *file, int *pos, worksheets **worksheets_obj, text_field **text_list, resultsList **resultlist_ref, int *line_cursor);
+worksheets *parse_worksheet_xml(char *file, int *pos, text_field **text_list, resultsList **resultlist_ref, int *line_cursor);
 
 #endif

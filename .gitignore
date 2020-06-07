@@ -10,6 +10,8 @@ test/
 
 *.o
 
+*.tex
+
 include/
 
 libs/
