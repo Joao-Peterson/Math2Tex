@@ -49,9 +49,9 @@ typedef struct st_worksheets worksheets;
 
 //estrutura de fila para vetores de pontos
 struct st_plotdata{
-    float value1;
-    float value2;
-    float value3;
+    double value1;
+    double value2;
+    double value3;
     struct st_plotdata *next;
 };
 typedef struct st_plotdata plotdata;  

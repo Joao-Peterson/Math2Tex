@@ -8,10 +8,10 @@ rang;
 add; 
 sub;
 mul;
+sca; // <scale> tag, just a constant multiplied by a variable 
 div;
 pow;
-sqrt;
-root;
+nroot;
 ln;
 log;
 logx;

@@ -112,7 +112,7 @@ int main(int argc, char **argv){
     check_luaVmachine(L, luaL_dofile(L, "../../scripts/type.lua"));
     check_luaVmachine(L, luaL_dostring(L, "fp = io.open(\"../../tex_files/output.tex\",\"w+\")"));
     
-    for(int i=0;i<=24;i++){
+    for(int i=0;i<=6;i++){
         myregion = get_region(worksheets_xml,0,0,i);
         if (myregion.region_id == -1) // in case of non existing id
             continue;

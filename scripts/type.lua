@@ -3,9 +3,17 @@
 --Referências:
 --http://www.malinc.se/math/latex/basiccodeen.php#:~:text=The%20code%20%5Ctimes%20is%20used,never%20be%20negative%20by%20definition.
 --https://www.overleaf.com/learn/latex/Integrals,_sums_and_limits
+--https://tex.stackexchange.com/questions/103988/rightarrow-with-text-above-it
+--https://www.overleaf.com/learn/latex/lists
+--Inclusão de arquivos .tex em outros : https://www.overleaf.com/learn/latex/Management_in_a_large_project#:~:text=The%20standard%20tools%20to%20insert,are%20%5Cinput%20and%20%5Cinclude%20.&text=Use%20this%20command%20in%20the,%5Cend%7Bdocument%7D%20).
 
-require("table")
-require("string")
+table = require("table")
+string = require("string")
+
+--Váriaveis Globais
+
+Precision = 3 -- decimal places precision
+
 
 --OPERAÇÕES MATEMÁTICAS BÁSICAS
 
@@ -25,6 +33,10 @@ function mul(a,b)
     return tostring(a).."\\cdot "..tostring(b)
 end
 
+function sca(a,b)
+    return tostring(a)..tostring(b)
+end
+
 function div(a,b)
     return "\\frac{"..tostring(a).."}{"..tostring(b).."}"
 end
@@ -33,8 +45,12 @@ function pow(a,b)
     return tostring(a).."^{"..tostring(b).."}"
 end
 
-function sqrt(a)
-    return "\\sqrt{"..tostring(a).."}"
+function nroot(a,b)
+    if a == " " then
+        return "\\sqrt{"..tostring(b).."}"
+    else    
+        return "\\sqrt["..tostring(a).."]{"..tostring(b).."}"
+    end
 end
 
 function logx(a,b)
@@ -68,8 +84,7 @@ function int(in_relation_to,func,lim_inf,lim_sup)
 end
 
 function lim(in_relation_to,func,to)
-    symbol = utf8.char(to)
-    if symbol == "∞" then
+    if to == "∞" then
         to = "\\infty"
     end
     return "\\lim_{"..tostring(in_relation_to).."\\to "..tostring(to).."} "..tostring(func)
@@ -109,7 +124,16 @@ function def(a,b)
     return tostring(a).."="..tostring(b)
 end
 
-function eva(a,b)
+function eval(a,b)
+    num = tonumber(b)
+
+    if num~=nil then -- if "b" is number
+        formatter = "%."..Precision.."e" -- to be formatted as scientific notation
+        b = string.format(formatter,num) -- as is 
+        b = string.gsub(b,"e","\\cdot 10^{") -- swap the e by the base 10 latex format
+        b = b.."}" -- end the string
+    end
+    
     return tostring(a).."="..tostring(b)
 end
 
@@ -138,6 +162,16 @@ end
 --OUTROS OPERADORES E SIMBOLOS
 
 function leg(a,b,c)
+    if a == "∞" then
+        a = "\\infty"
+    end
+    if b == "∞" then
+        b = "\\infty"
+    end
+    if c == "∞" then
+        c = "\\infty"
+    end
+
     if (b == " ") and (c ~= " ") then
         return tostring(a).."^{"..tostring(c).."}"
     elseif (b ~= " ") and (c == " ") then
@@ -171,10 +205,11 @@ function para(...)
     arg={...}
     expression = ""
     for i,v in ipairs(arg) do
-        if i==n-1 then
+        v, n = string.gsub(v,"⨌","") --if it have the special character ⨌ then it is a text string, otherwise it is a math string inside a text string, therefore receiver "$..$" to idnicate math inline 
+        if n > 0 then
             expression = expression..tostring(v)
-        else        
-            expression = expression..tostring(v)
+        else
+            expression = expression.." $"..tostring(v).."$ "
         end
     end
     return expression

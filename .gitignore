@@ -12,6 +12,8 @@ test/
 
 *.tex
 
+tex_files/
+
 include/
 
 libs/

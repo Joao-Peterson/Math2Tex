@@ -25,6 +25,7 @@ int paragraph_parser(char *file, int *pos, char *expression, int *line_cursor){
             placeholder=1;
             read_tag(file,pos,mytag,line_cursor);
 
+            strcat(buffer,"⨌"); // to indicate that it is a text string and not a math string
             while(!atb_cmp(mytag,0,"/Run")){
                 placeholder=0;
 
@@ -47,7 +48,7 @@ int paragraph_parser(char *file, int *pos, char *expression, int *line_cursor){
             }
         }
 
-        buffer[0]='\0'; // clean buffer
+        buffer[0]='\0'; // set buffer as empty
         strcat(expression,","); // separate 
         read_tag(file,pos,mytag,line_cursor);
     }
@@ -106,6 +107,7 @@ int text_format(char *file, int *pos, tag *tag_ref, char *expression, int *line_
     }else{
         log_to_console("error","Tag inválida encontrada",0,line_cursor);
         log_to_console("tag?",atb_get(tag_ref,0),0,line_cursor);
+        return error;
     }
 
     return true;

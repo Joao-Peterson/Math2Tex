@@ -109,7 +109,20 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
     read_tag(file, pos, mytag, line_cursor);
 
      // se iniciar com operador é uma operação
-    if (atb_cmp(mytag, 0, "plus") | atb_cmp(mytag, 0, "minus") | atb_cmp(mytag, 0, "mult") | atb_cmp(mytag, 0, "div") | atb_cmp(mytag, 0, "pow") | atb_cmp(mytag, 0, "equal")|atb_cmp(mytag,0,"parens")|atb_cmp(mytag,0,"neg")|atb_cmp(mytag,0,"limit")|atb_cmp(mytag,0,"derivative")|(atb_cmp(mytag,0,"integral")))
+    if (atb_cmp(mytag, 0, "plus") | 
+        atb_cmp(mytag, 0, "minus") | 
+        atb_cmp(mytag, 0, "mult") | 
+        atb_cmp(mytag, 0, "div") | 
+        atb_cmp(mytag, 0, "pow") | 
+        atb_cmp(mytag, 0, "equal") |
+        atb_cmp(mytag,0,"parens") |
+        atb_cmp(mytag,0,"neg") |
+        atb_cmp(mytag,0,"limit") |
+        atb_cmp(mytag,0,"derivative") |
+        atb_cmp(mytag,0,"integral") |
+        atb_cmp(mytag,0,"scale") |
+        atb_cmp(mytag,0,"nthRoot")
+        )
     {
         if (atb_cmp(mytag, 0, "plus"))
         { // verifica qual operador matemático e adiciona a expressão
@@ -165,6 +178,16 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
         {
             strcat(expression,"int(");
             log_to_console("tag","<integral>",0,line_cursor);
+        }
+        else if (atb_cmp(mytag,0,"scale"))
+        {
+            strcat(expression,"sca(");            
+            log_to_console("tag","<scale>",0,line_cursor);
+        }
+        else if (atb_cmp(mytag,0,"nthRoot"))
+        {
+            strcat(expression,"nroot(");            
+            log_to_console("tag","<nthroot>",0,line_cursor);
         }
         
         read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
@@ -633,16 +656,16 @@ int math_parser(char *file, int *pos, char *expression, int result_ref, resultsL
     return true;
 }
 
-//text parser
+//text parser, write to expression the text read from the .xaml files in mathcad/Xaml processed to swap the placeholder's by the actual symbols and fields in the text field
 int text_parser(char *file, int *pos, char *expression, int result_ref, text_field **text_list, resultsList **resultslist_ref, int *line_cursor){
     allocate(mytag,tag);
     regions *myregions = NULL;
 
     read_tag(file,pos,mytag,line_cursor);
-    while(!atb_cmp(mytag,0,"/text")){
+    while(!atb_cmp(mytag,0,"/text")){ // read <text> body
 
-        if(atb_cmp(mytag,0,"regions")){
-            if(parse_regions(file,pos,&myregions,mytag,text_list, resultslist_ref,line_cursor)!=true){
+        if(atb_cmp(mytag,0,"regions")){ // parse regions
+            if(parse_regions(file,pos,&myregions,mytag,text_list,resultslist_ref,line_cursor)!=true){
                 log_to_console("error","Erro ao processar tag <regions>",0,line_cursor);
                 return error;
             }
@@ -651,21 +674,22 @@ int text_parser(char *file, int *pos, char *expression, int result_ref, text_fie
         read_tag(file,pos,mytag,line_cursor);
     }
 
-    char *raw_text = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT); // raw text from xaml parser
+    char *raw_text = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
     char *buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT); 
-    strncpy(raw_text,get_text_field(text_list, result_ref),REGION_EXPRESSION_LEN_DEFAULT);
+    strncpy(raw_text,get_text_field(text_list, result_ref),REGION_EXPRESSION_LEN_DEFAULT); // raw text from xaml parser
     int placeholder_offset = strlen(TEXT_PLACE_HOLDER)*sizeof(char); // lenght of placeholder
     char *token_start;
     char *token_end;
 
     regions *cursor = myregions;
-    while(cursor!=NULL){  // substitute placeholders
-        token_start = strstr(raw_text,TEXT_PLACE_HOLDER);
+    while(cursor!=NULL){  // substitute placeholders running trought the linked list
+        token_start = strstr(raw_text,TEXT_PLACE_HOLDER); // find placeholder
         token_end = token_start + placeholder_offset;
-        strncpy(buffer,token_end,strlen(token_end)+1); // save string after the token, +1 to acomodate the '\0' at the end 
-        strncpy(token_start,cursor->region_data->expression,strlen(cursor->region_data->expression)+1); // substitute de place holder
+        strncpy(buffer,token_end,strlen(token_end)+1); // save string after the token, +1 to acomodate the '\0' at the end
+        snprintf(token_start,strlen(cursor->region_data->expression)+1,"%s",cursor->region_data->expression); // substitute the place holder
+        //strncpy(token_start,cursor->region_data->expression,strlen(cursor->region_data->expression)+1); 
         strcat(token_start,buffer); // bring back the rest 
-
+ 
         cursor=cursor->next;
     }
 
