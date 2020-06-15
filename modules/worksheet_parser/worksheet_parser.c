@@ -115,13 +115,13 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
         atb_cmp(mytag, 0, "div") | 
         atb_cmp(mytag, 0, "pow") | 
         atb_cmp(mytag, 0, "equal") |
-        atb_cmp(mytag,0,"parens") |
-        atb_cmp(mytag,0,"neg") |
-        atb_cmp(mytag,0,"limit") |
-        atb_cmp(mytag,0,"derivative") |
-        atb_cmp(mytag,0,"integral") |
-        atb_cmp(mytag,0,"scale") |
-        atb_cmp(mytag,0,"nthRoot")
+        atb_cmp(mytag, 0, "parens") |
+        atb_cmp(mytag, 0, "neg") |
+        atb_cmp(mytag, 0, "limit") |
+        atb_cmp(mytag, 0, "derivative") |
+        atb_cmp(mytag, 0, "integral") |
+        atb_cmp(mytag, 0, "scale") |
+        atb_cmp(mytag, 0, "nthRoot")
         )
     {
         if (atb_cmp(mytag, 0, "plus"))
@@ -167,6 +167,11 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
         else if (atb_cmp(mytag,0,"limit"))
         {
             strcat(expression,"lim(");
+            if (mytag->argq>1){ // if there is a limit direction, that is described in the first argument of <limit>
+                strcat(expression,"\"");
+                strcat(expression,atb_read_value(atb_get(mytag,1))); // cat to the expression the direction
+                strcat(expression,"\",");
+            }
             log_to_console("tag","<limit>",0,line_cursor);
         }
         else if (atb_cmp(mytag,0,"derivative"))

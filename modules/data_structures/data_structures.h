@@ -10,7 +10,7 @@
 #define REGION_TYPE_LEN_DEFAULT 25
 #define REGION_EXPRESSION_LEN_DEFAULT 1000
 
-/*Estruturas------------------------------------------------------------------------*/
+/*Estruturas--------------------------------------------------------------------*/
 
 //estrutura de uma região
 struct st_region{

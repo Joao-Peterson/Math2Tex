@@ -159,28 +159,34 @@ int document_parser(char *filename, int id, text_field **head){
     return true;
 }
 
-text_field *extract_docs(DIR *handle){ //expects the xaml dir containing the packages
+text_field *extract_docs(char *path){ //expects the xaml dir containing the packages
+    DIR *handle = opendir(path);
+    if(handle==NULL){
+        printf("Diretorio invalido!\n");
+        return NULL;
+    }
+
     struct dirent *entry=NULL;
     char entry_name[REL_PATH_LEN_MAX]={0};
     char entry_name_id[REL_PATH_LEN_MAX]={0};
-    char *buffer;
     int id;
     text_field *head = NULL;
 
     while((entry=readdir(handle))!=NULL){ // read all the xaml directory 
-        strncpy(entry_name,"mathcad/xaml/",REL_PATH_LEN_MAX); 
-        strncpy(entry_name_id,"mathcad/xaml/",REL_PATH_LEN_MAX); // fixes the path to be relative to mathcad dir
-        strcat(entry_name,entry->d_name);
-        strcat(entry_name_id,entry->d_name); // copy the name two times
-        printf(">> %s\n",entry_name);
+        
+        snprintf(entry_name,REL_PATH_LEN_MAX,"%s/%s",path,entry->d_name); // path to file
+        strncpy(entry_name_id,entry_name,REL_PATH_LEN_MAX); // copy for later use 
+
+        if(is_console_log_enable()==1)
+            printf(">> %s\n",entry->d_name); // just for show
         
         if(strstr(entry_name,".XamlPackage")!=NULL){ // if it is a package file
             strcrop(entry_name_id,".XamlPackage"); // cut the file extension, so it will be the directory to unzip
 
-            zip_extract(entry_name, entry_name_id, on_extract_entry, NULL); // extract
+            zip_extract(entry_name, entry_name_id, on_extract_entry, NULL); // extract to no file extension path
 
-            strcrop(entry_name_id,"FlowDocument"); // cut the prefix
-            strcrop(entry_name_id,"mathcad/xaml/");
+            strcrop(entry_name_id,"/FlowDocument"); // cut the prefix
+            strcrop(entry_name_id,path); // crop the relative path
             id=atoi(entry_name_id); // pick the id
 
             strcrop(entry_name,".XamlPackage"); // cut the file extension

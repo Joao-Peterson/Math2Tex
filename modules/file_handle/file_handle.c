@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 char *filename_to_folder(char *filename_path){
     char *buffer = (char*)malloc(sizeof(char)*strlen(filename_path));
@@ -65,12 +66,12 @@ void rm_dir(char *filename){
             len = path_len + strlen(entry->d_name) + 2; // 2 = '/' and '\0' , the two '\0' of both strings were not counted
             rel_path = (char*)malloc(len);
             snprintf(rel_path,len,"%s/%s",filename,entry->d_name);
-
-            if(entry->d_type==DT_DIR){
+            
+            unlink(rel_path);
+            //printf("Debug errno: %d\n",errno);
+            if(errno==EISDIR | errno==EACCES){ // if it is a directory. acess can be retricted
                 rm_dir(rel_path);
                 free(rel_path);
-            }else{
-                unlink(rel_path);
             }
         }
     }

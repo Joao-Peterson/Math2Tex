@@ -151,13 +151,18 @@ regions *read_region(regions **regions_ref, int id){
 //retorna objeto region de uma lista regions de uma lista worksheets
 region get_region(worksheets *xml, int worksheet_id, int regions_id, int region_id){
     allocate(node, region);
+    node->region_id=-1; // to indicate failure
+    
     worksheets *myworksheet = read_worksheet(&xml,worksheet_id); // retorna endereço de um nó worksheets que contém um worksheet 
-    worksheet *myregions = read_regions(&(myworksheet->worksheet_data),regions_id); // retorna endereço de um nó worksheet que contém um regions 
-    regions *myregion = read_region(&(myregions->regions_data), region_id); // retorna endereço de um nó regions que contém um region
-    if (myregion==NULL){
-        node->region_id=-1; // to indicate failure
+    if (myworksheet==NULL)
         return *node;
-    }
+    worksheet *myregions = read_regions(&(myworksheet->worksheet_data),regions_id); // retorna endereço de um nó worksheet que contém um regions 
+    if (myregions==NULL)
+        return *node;
+    regions *myregion = read_region(&(myregions->regions_data), region_id); // retorna endereço de um nó regions que contém um region
+    if (myregion==NULL)
+        return *node;
+    
     free(node);
     return *(myregion->region_data); // retorna objeto region
 }
@@ -210,6 +215,7 @@ plotdata *read_plotdata(plotdata **plotdata_ref, int id){
     return temp;
 }
 
+//inicializa results list
 void begin_results_list(resultsList **myresultslist){
     (*myresultslist)->next=NULL; // nulo pois é o primeiro elemento
     return ;

@@ -2,7 +2,7 @@
 #define _XAML_PARSER
 
 #define TEXT_FIELD_MAX_CHR 5000
-#define REL_PATH_LEN_MAX 60
+#define REL_PATH_LEN_MAX 100
 
 #include "../xml_parser/xml_parser.h"
 #include "../logger/logger.h"
@@ -25,6 +25,6 @@ int text_format(char *file, int *pos, tag *tag_ref, char *expression, int *line_
 int document_parser(char *filename, int id, text_field **head);
 
 //receives handle for the xaml directory, unpack and parser it, return pointer to the head of the list text_field
-text_field *extract_docs(DIR *handle);
+text_field *extract_docs(char *path);
 
 #endif

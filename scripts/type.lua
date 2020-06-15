@@ -83,11 +83,30 @@ function int(in_relation_to,func,lim_inf,lim_sup)
     end
 end
 
-function lim(in_relation_to,func,to)
+function lim(direction,in_relation_to,func,to) -- receives 3 or 4 arguments depending if a direction was specified
+    if to == nil then -- when receveing 3 args, "to" is nil, hence, we shift the arguments accordingly
+        to = func
+        func = in_relation_to
+        in_relation_to = direction
+        direction = nil
+    end
+
     if to == "∞" then
         to = "\\infty"
     end
-    return "\\lim_{"..tostring(in_relation_to).."\\to "..tostring(to).."} "..tostring(func)
+
+    if direction == nil then
+        return "\\lim_{"..tostring(in_relation_to).."\\to "..tostring(to).."} "..tostring(func)
+
+    else -- if direction was specified
+        if direction == "right" then -- correct character
+            direction = "+"
+        elseif direction == "left" then
+            direction = "-"
+        end
+        
+        return "\\lim_{"..tostring(in_relation_to).."\\to "..tostring(to).."^{"..tostring(direction).."}".."} "..tostring(func)
+    end        
 end
 
 
@@ -113,9 +132,9 @@ function symb(...)
     end
 
     if symb_expression==" " then
-        return expression.."\\rightarrow "..end_expression
+        return expression.."="..end_expression
     else
-        return expression.."\\xrightarrow{"..symb_expression.."} "..end_expression
+        return expression.."="..end_expression
     end        
     -- expression é o lado direito da avaliação, symb_expression são os argumentos sob a seta, end_expression é o resultado da avaliação
 end
@@ -129,9 +148,16 @@ function eval(a,b)
 
     if num~=nil then -- if "b" is number
         formatter = "%."..Precision.."e" -- to be formatted as scientific notation
-        b = string.format(formatter,num) -- as is 
-        b = string.gsub(b,"e","\\cdot 10^{") -- swap the e by the base 10 latex format
-        b = b.."}" -- end the string
+        b = string.format(formatter,num)
+        exp = string.sub(b,string.find(b,"e[0-9%+%-]+")) -- exponent
+        exp = tonumber(string.sub(exp,string.find(exp,"[%+%-%d]+"))) -- just the number
+        if exp ~= 0 then
+            b = string.gsub(b,"e[%+%-%d]+","\\cdot 10^{") -- swap the "e" by the base 10 latex format
+            b = b..tostring(exp).."}" -- end the string
+        else -- when the exponent is 0, therefore, no need to the base 10 notation
+            b = string.gsub(b,"e[%+%-%w]+","") -- remove the exponent
+        end
+
     end
     
     return tostring(a).."="..tostring(b)
@@ -256,14 +282,4 @@ function add_field(expression, type, fp)
     fp:write("\n\n")
 end
 
---print(  symb(deri(leg("t"," "," "),func(leg("H"," "," "),leg("t"," "," "))," "), ,deri(leg("t"," "," "),func(leg("H"," "," "),leg("t"," "," "))," "))  )
-
---fp = io.open("output.tex","w+")
-
---expression = add(5,sub(6,-2))
-
---print(math_format(expression,"inline"))
-
---add_field(expression,"math",fp)
-
---fp:close()
+--print(eval(func(leg("g"," "," "),div("1","2")),"-0.001740088802762"))
