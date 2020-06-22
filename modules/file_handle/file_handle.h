@@ -3,9 +3,6 @@
 
 #include <dirent.h>
 
-// returns a string wich is the filename for a file, but the extension removed
-char *filename_to_folder(char *filename_path);
-
 // called every time the zip_extract() from libzip extracts a entry
 int on_extract_entry(const char *filename, void *arg);
 

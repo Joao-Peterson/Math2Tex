@@ -128,24 +128,22 @@ void add_region(regions **regions_ref, region *data){
 
 //retorna endereço de uma regions da lista regions
 regions *read_region(regions **regions_ref, int id){
-    regions *regions_temp = *regions_ref;
-    allocate(node,regions); // nó para retornar depois
     
     if((*regions_ref)==NULL){ // se ponteiro repassado é nulo
-        return node; // retorna memória alocada vazia de propósito
+        return NULL; 
     }
-    free(node); // libera espaço não utilizado em caso de ponterio inválido, como acima
 
-    while(regions_temp!=NULL){ // percorre até chegar em id
-        if(id==regions_temp->region_data->region_id){
-            node=regions_temp; // recebe endereço 
-            return node; // retorna dados
-        }
+    regions *regions_temp = *regions_ref;
+    
+    while(id>0){ // percorre até chegar em id
+        if(regions_temp==NULL)
+            return NULL;
 
+        id--;            
         regions_temp=regions_temp->next;
     }
 
-    return NULL;
+    return regions_temp;
 }
 
 //retorna objeto region de uma lista regions de uma lista worksheets
@@ -327,5 +325,90 @@ void print_text_field(text_field **head){
     while(cursor!=NULL){
         printf("ID: %i , TEXTO: %s\n",cursor->id,cursor->text);
         cursor=cursor->next;
+    }
+}
+
+//add new nide o list of images
+void img_add(img_list **head, char* filename){
+    img_list *cursor = *head;
+    
+    allocate(node,img_list);
+
+    if (strlen(filename)>PATH_LENGTH_MAX)
+    {
+        printf("[ERROR]: Path da string é maior que \"PATH_LENGTH_MAX\" definido em \"data_structures.h\"\n");
+    }
+    
+    strncpy(node->path,filename,PATH_LENGTH_MAX);
+    node->next=NULL;
+
+    if (*head == NULL)
+    {
+        *head = node;
+        return;
+    }
+    else
+    {
+        while(cursor->next!=NULL)
+            cursor = cursor->next;
+
+        cursor->next = node;
+        return;
+    }
+}
+
+//get filename from node list in position "pos"
+char *img_get_path(img_list **head,int pos){
+    if (*head==NULL)
+        return NULL;
+
+    img_list *cursor = *head;
+
+    while(pos>0)
+    {
+        cursor=cursor->next;
+
+        if(cursor==NULL)
+            return NULL;
+        
+        pos--;
+    }
+
+    return cursor->path;
+}
+
+//change the path of a node in a img_list
+void img_modify(img_list **head, char *new_path, int pos){
+    if (*head==NULL)
+        return;
+
+    img_list *cursor = *head;
+
+    while(pos>0)
+    {
+        cursor=cursor->next;
+
+        if(cursor==NULL)
+            return;        
+        pos--;
+    }
+
+    strncpy(cursor->path,new_path,PATH_LENGTH_MAX);
+    return;
+}
+
+//runs trught the list printing it
+void img_print_list(img_list **head){
+    img_list *cursor = *head;
+    if(cursor == NULL)
+        return;
+
+    int i=0;
+
+    printf("----------- Lista de imagens -----------\n");
+    while(cursor->next!=NULL){
+        printf("Imagem [%d] : %s\n",i,cursor->next);
+        i++;
+        cursor = cursor->next;
     }
 }

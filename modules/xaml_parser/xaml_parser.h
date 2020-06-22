@@ -24,7 +24,7 @@ int text_format(char *file, int *pos, tag *tag_ref, char *expression, int *line_
 //called on a Document.xaml, write node to text_field list
 int document_parser(char *filename, int id, text_field **head);
 
-//receives handle for the xaml directory, unpack and parser it, return pointer to the head of the list text_field
+//receives the filename the xaml directory, unpack and parser it, return pointer to the head of the list text_field
 text_field *extract_docs(char *path);
 
 #endif

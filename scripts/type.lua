@@ -65,6 +65,10 @@ function ln(a)
     return "\\ln "..tostring(a)
 end
 
+function degree(a)
+    return tostring(a).."^{\\circ}"
+end
+
 --OPERAÇÕES DE CÁLCULO
 
 function deri(in_relation_to,func,degree)
@@ -187,16 +191,55 @@ end
 
 --OUTROS OPERADORES E SIMBOLOS
 
+-- Tabela e função para conversão de simbolos unicode para notação latex
+
+local symbols = {
+    ["∞"] = "\\infty",
+    ["π"] = "\\pi",
+    ["Π"] = "\\Pi",
+    ["Ω"] = "\\Omega",
+    ["ω"] = "\\omega",
+    ["φ"] = "\\phi",
+    ["ϕ"] = "\\varphi",
+    ["Φ"] = "\\Phi",
+    ["ξ"] = "\\xi",
+    ["σ"] = "\\sigma",
+    ["Σ"] = "\\Sigma",
+    ["α"] = "\\alpha",
+    ["ς"] = "\\varsigma",
+    ["τ"] = "\\tau",
+    ["ζ"] = "\\zeta",
+    ["β"] = "\\beta",
+    ["γ"] = "\\gamma",
+    ["Γ"] = "\\Gamma",
+    ["δ"] = "\\delta",
+    ["Δ"] = "\\Delta",
+    ["ε"] = "\\epsilon",
+    ["η"] = "\\eta",
+    ["θ"] = "\\theta",
+    ["Θ"] = "\\Theta",
+    ["κ"] = "\\kappa",
+    ["λ"] = "\\lambda",
+    ["Λ"] = "\\Lambda",
+    ["ρ"] = "\\rho",
+    ["ν"] = "\\nu",
+    ["Ψ"] = "\\psi",
+    ["ψ"] = "\\Psi",
+    ["Χ"] = "\\chi"
+}
+
+local function is_math_symbol(symb)
+    local check = string.find(symb,"[%∞%π%Π%Ω%ω%φ%ϕ%Φ%ξ%σ%Σ%α%ς%τ%ζ%β%γ%Γ%δ%Δ%ε%η%θ%Θ%κ%λ%Λ%ρ%ν%Ψ%ψ%Χ]")
+    if check ~= nil then
+        return symbols[symb]
+    end
+    return symb
+end
+
 function leg(a,b,c)
-    if a == "∞" then
-        a = "\\infty"
-    end
-    if b == "∞" then
-        b = "\\infty"
-    end
-    if c == "∞" then
-        c = "\\infty"
-    end
+    a = is_math_symbol(a);
+    b = is_math_symbol(b);
+    c = is_math_symbol(c);
 
     if (b == " ") and (c ~= " ") then
         return tostring(a).."^{"..tostring(c).."}"
@@ -212,6 +255,8 @@ end
 function parens(a)
     return "("..tostring(a)..")"
 end
+
+
 
 --DEFINIÇÕES DE TEXTO
 
@@ -231,7 +276,7 @@ function para(...)
     arg={...}
     expression = ""
     for i,v in ipairs(arg) do
-        v, n = string.gsub(v,"⨌","") --if it have the special character ⨌ then it is a text string, otherwise it is a math string inside a text string, therefore receiver "$..$" to idnicate math inline 
+        v, n = string.gsub(v,"⨌","") --if it have the special character ⨌ then it is a text string, otherwise it is a math string inside a text string, therefore receive "$..$" to indicate math inline 
         if n > 0 then
             expression = expression..tostring(v)
         else
@@ -255,6 +300,55 @@ function text(...)
     return expression
 end
 
+--DEFINIÇÕES DE IMAGEM
+
+local IMAGE_SCALE_STANDARD = "height=4cm" -- escala padrão de imagem
+
+local img_ref = 0 -- conta quantas imagens foram usadas
+                  -- se usa na geração de titulos e outros campos automáticos
+
+function img(filename,title,source,label,scale)
+    if filename == "(null)" then
+        return ""
+    end
+
+    if title == nil then ------- Em caso the se especificar só uma imagem sem titulo nem nada
+        expression = [[
+\begin{figure}[h!]
+    \centering
+    \caption
+    \includegraphics[_IMG_SCALE_]{_IMAGE_PATH_}
+    
+\label{_LABEL_}
+\end{figure}
+        ]]
+        expression = string.gsub(expression,"_IMAGE_PATH_",filename)
+        expression = string.gsub(expression,"_IMG_SCALE_",IMAGE_SCALE_STANDARD)
+        expression = string.gsub(expression,"_LABEL_","fig:"..tostring(img_ref))
+
+    else -------------------------- Em caso de se especificar imagem com todas as informações
+
+        expression = [[
+\begin{figure}[h!]
+    \centering
+    \caption{_TITULO_}
+    \includegraphics[_IMG_SCALE_]{_IMAGE_PATH_}
+            
+Fonte: _FONTE_
+\label{_LABEL_}
+\end{figure}
+        ]]
+        expression = string.gsub(expression,"_TITULO_",title)        
+        expression = string.gsub(expression,"_IMG_SCALE_",IMAGE_SCALE_STANDARD)
+        expression = string.gsub(expression,"_IMAGE_PATH_",filename)
+        expression = string.gsub(expression,"_FONTE_",source)
+        expression = string.gsub(expression,"_LABEL_","fig:"..tostring(img_ref))
+    end
+
+    img_ref = img_ref + 1 -- incrementa contador de referência de imagem
+
+    return expression
+end
 
 --ÁREA DE CÓDIGO NATIVO, NÃO ALTERAR
 
@@ -270,9 +364,15 @@ function math_format(string, format)
 end
 
 function add_field(expression, type, fp)
+    if expression == "" then -- there is no expression
+        return
+    end
+
     if type == "math" then
         format = "nline"
     elseif type == "text" then
+        format = "text"
+    elseif type == "image" then
         format = "text"
     else
         format = "inline"
@@ -281,5 +381,3 @@ function add_field(expression, type, fp)
     fp:write(math_format(expression, format))
     fp:write("\n\n")
 end
-
---print(eval(func(leg("g"," "," "),div("1","2")),"-0.001740088802762"))

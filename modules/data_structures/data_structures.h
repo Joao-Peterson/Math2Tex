@@ -9,6 +9,7 @@
 #define REGION_QTDY_DEFAULT 100
 #define REGION_TYPE_LEN_DEFAULT 25
 #define REGION_EXPRESSION_LEN_DEFAULT 1000
+#define PATH_LENGTH_MAX 250
 
 /*Estruturas--------------------------------------------------------------------*/
 
@@ -65,14 +66,19 @@ struct st_resultsList{
 };
 typedef struct st_resultsList resultsList;
 
-struct st_text_field
-{
+struct st_text_field{
     int id;
     tag tags;
     char *text;
     struct st_text_field *next;
 };
 typedef struct st_text_field text_field;
+
+struct img_list_st{
+    char path[PATH_LENGTH_MAX];
+    struct img_list_st *next;
+};
+typedef struct img_list_st img_list;
 
 
 /*Listas------------------------------------------------------------------------*/
@@ -125,5 +131,18 @@ char *get_text_field(text_field **head, int id);
 
 //run trought the list printing entries
 void print_text_field(text_field **head);
+
+
+//add new nide o list of images
+void img_add(img_list **head, char* filename);
+
+//get filename from node list in position "pos"
+char *img_get_path(img_list **head,int pos);
+
+//change the path of a node in a img_list
+void img_modify(img_list **head, char *new_path, int pos);
+
+//runs trught the list printing it
+void img_print_list(img_list **head);
 
 #endif

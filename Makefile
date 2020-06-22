@@ -21,9 +21,11 @@ TAR_UTILITY = tar
 TAR_ARG = -c -v -z -f 
 RELEASE_DIR = releases/
 TAR_NAME = $(RELEASE_DIR)Math2Tex_Win_x86_64_$(VERSION).tar.gz
-PACK_FILES = $(MAIN_EXE).exe *.lua 
+PACK_FILES = $(MAIN_EXE).exe *.lua *.bat
 LUA_SCRIPTS = $(wildcard scripts/*.lua)
 LUA_MOVE = $(subst scripts/,,$(LUA_SCRIPTS))
+BAT_SCRIPT = scripts/_RUN_M2TEX_.bat
+BAT_MOVE = $(subst scripts/,,$(BAT_SCRIPT))
 
 # Diretórios :
 HEADERS_PATH = -Iinclude
@@ -52,8 +54,10 @@ all: build
 pack: release
 	@echo Packing...
 	cp -r $(LUA_SCRIPTS) $(LUA_MOVE)
+	cp -r $(BAT_SCRIPT) $(BAT_MOVE)
 	$(TAR_UTILITY) $(TAR_ARG) $(TAR_NAME) $(PACK_FILES)
 	rm -f $(LUA_MOVE)
+	rm -f $(BAT_MOVE)
 	@echo Done packing.
 
 #Compila como release

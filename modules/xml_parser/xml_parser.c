@@ -8,30 +8,6 @@
 #define true 0
 #define error 1
 
-//recorta string dentro de outra, fechando o espaço vazio
-void strcrop(char *string, const char* token){
-    char *token_begin = NULL;
-    char *token_end=NULL;
-    int token_len = strlen(token);
-
-    if((token_begin=strstr(string,token))==NULL){
-        return;
-    }
-
-    token_end=token_begin+token_len*sizeof(char);
-
-    strncpy(token_begin,token_end,strlen(token_end)+1);
-}
-
-//exclúi ultimo caractere de uma string
-void strdel_last(char *string, int qtd){
-    int i=0;
-    while(string[i]!='\0'){
-        i++;
-    }
-    string[i-qtd]='\0';
-}
-
 //grava arquivo txt na memória, uma string
 char *read_asci(const char *path){
     FILE *file = fopen(path, "r"); //abre arquivo

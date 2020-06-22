@@ -39,6 +39,8 @@ void log_to_console(const char *type, const char *msg, int id, int *line){
             printf("[Parser] - %s [%d] - line %d \n",msg,id,*line);
         }else if(strcmp(type,"tag?")==0){
             printf("[Unknown] - <%s> - line %d \n",msg,*line);
+        }else if(strcmp(type,"File")==0){
+            printf("[File] - Arquivo lido com sucesso : %s - line %d \n",msg,*line);
         }else{
             printf("[ERROR] - %s - line %d - %s\n",type,*line,msg);
         }

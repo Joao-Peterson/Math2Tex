@@ -4,20 +4,6 @@
 #include <stdlib.h>
 #include <errno.h>
 
-char *filename_to_folder(char *filename_path){
-    char *buffer = (char*)malloc(sizeof(char)*strlen(filename_path));
-    int i=0;
-    while(filename_path[i]!='\0'){
-        buffer[i]=filename_path[i];
-        i++;
-    }
-    while(filename_path[i]!='.'){
-        i--;
-    }
-    buffer[i]='\0';
-    return buffer;
-}
-
 int on_extract_entry(const char *filename, void *arg){ // chama ao extrair uma entry, arquivo, todo vez
     // static int i = 0;
     // int n = 1;

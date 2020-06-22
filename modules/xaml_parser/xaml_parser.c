@@ -1,4 +1,5 @@
 #include "xaml_parser.h"
+#include "../logger/logger.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -12,7 +13,7 @@
 
 int paragraph_parser(char *file, int *pos, char *expression, int *line_cursor){
     allocate(mytag,tag);
-    char *buffer = (char*)malloc(REGION_EXPRESSION_LEN_DEFAULT/10);
+    char *buffer = (char*)malloc(REGION_EXPRESSION_LEN_DEFAULT);
     buffer[0]='\0';
     read_tag(file,pos,mytag,line_cursor);
     log_to_console("tag","Paragraph",0,line_cursor);
@@ -161,8 +162,8 @@ int document_parser(char *filename, int id, text_field **head){
 
 text_field *extract_docs(char *path){ //expects the xaml dir containing the packages
     DIR *handle = opendir(path);
-    if(handle==NULL){
-        printf("Diretorio invalido!\n");
+    if(handle==NULL & is_console_log_enable()){
+        printf("Nao ha diretorio .Xaml\n");
         return NULL;
     }
 

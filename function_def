@@ -29,6 +29,9 @@ prod;
 neg;
 leg; ;leg(V,s,u)
 paren;
+degree;
 
 text; // text type
 para; // paragrapher
+
+img // image path

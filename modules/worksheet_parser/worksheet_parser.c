@@ -10,6 +10,20 @@
 #define true 0
 #define error 1
 
+int img_counter = 0; // counts how many "imageble" fields are, that is, all regions of the xml except the text regions 
+
+void img_count_add(){
+    img_counter++;
+}
+
+int img_count_get(){
+    return img_counter;
+}
+
+void img_counter_zero(){
+    img_counter=0;
+}
+
 //parser de tags genéricas que, para o propósito deste programa, melhor serem ignoradas
 int parser_generic(char *file, int *pos, char *tag_name, char *expression, int *line_cursor){
     char *tag_closing = (char*)malloc(sizeof(char)*(strlen(tag_name)+10));
@@ -108,99 +122,100 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
     allocate(mytag,tag);
     read_tag(file, pos, mytag, line_cursor);
 
-     // se iniciar com operador é uma operação
-    if (atb_cmp(mytag, 0, "plus") | 
-        atb_cmp(mytag, 0, "minus") | 
-        atb_cmp(mytag, 0, "mult") | 
-        atb_cmp(mytag, 0, "div") | 
-        atb_cmp(mytag, 0, "pow") | 
-        atb_cmp(mytag, 0, "equal") |
-        atb_cmp(mytag, 0, "parens") |
-        atb_cmp(mytag, 0, "neg") |
-        atb_cmp(mytag, 0, "limit") |
-        atb_cmp(mytag, 0, "derivative") |
-        atb_cmp(mytag, 0, "integral") |
-        atb_cmp(mytag, 0, "scale") |
-        atb_cmp(mytag, 0, "nthRoot")
-        )
+    if (atb_cmp(mytag, 0, "plus"))
+    { // verifica qual operador matemático e adiciona a expressão
+        strcat(expression, "add(");
+        log_to_console("tag", "<plus>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "minus"))
     {
-        if (atb_cmp(mytag, 0, "plus"))
-        { // verifica qual operador matemático e adiciona a expressão
-            strcat(expression, "add(");
-            log_to_console("tag", "<plus>", 0, line_cursor);
+        strcat(expression, "sub(");
+        log_to_console("tag", "<minus>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "mult"))
+    {
+        strcat(expression, "mul(");
+        log_to_console("tag", "<mult>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "div"))
+    {
+        strcat(expression, "div(");
+        log_to_console("tag", "<div>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "pow"))
+    {
+        strcat(expression, "pow(");
+        log_to_console("tag", "<pow>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "equal"))
+    {
+        strcat(expression, "equal(");
+        log_to_console("tag", "<equal>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "parens"))
+    {
+        strcat(expression, "parens(");
+        log_to_console("tag", "<parens>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "neg"))
+    {
+        strcat(expression, "neg(");
+        log_to_console("tag", "<neg>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag,0,"limit"))
+    {
+        strcat(expression,"lim(");
+        if (mytag->argq>1){ // if there is a limit direction, that is described in the first argument of <limit>
+            strcat(expression,"\"");
+            strcat(expression,atb_read_value(atb_get(mytag,1))); // cat to the expression the direction
+            strcat(expression,"\",");
         }
-        else if (atb_cmp(mytag, 0, "minus"))
-        {
-            strcat(expression, "sub(");
-            log_to_console("tag", "<minus>", 0, line_cursor);
-        }
-        else if (atb_cmp(mytag, 0, "mult"))
-        {
-            strcat(expression, "mul(");
-            log_to_console("tag", "<mult>", 0, line_cursor);
-        }
-        else if (atb_cmp(mytag, 0, "div"))
-        {
-            strcat(expression, "div(");
-            log_to_console("tag", "<div>", 0, line_cursor);
-        }
-        else if (atb_cmp(mytag, 0, "pow"))
-        {
-            strcat(expression, "pow(");
-            log_to_console("tag", "<pow>", 0, line_cursor);
-        }
-        else if (atb_cmp(mytag, 0, "equal"))
-        {
-            strcat(expression, "equal(");
-            log_to_console("tag", "<equal>", 0, line_cursor);
-        }
-        else if (atb_cmp(mytag, 0, "parens"))
-        {
-            strcat(expression, "parens(");
-            log_to_console("tag", "<parens>", 0, line_cursor);
-        }
-        else if (atb_cmp(mytag, 0, "neg"))
-        {
-            strcat(expression, "neg(");
-            log_to_console("tag", "<neg>", 0, line_cursor);
-        }
-        else if (atb_cmp(mytag,0,"limit"))
-        {
-            strcat(expression,"lim(");
-            if (mytag->argq>1){ // if there is a limit direction, that is described in the first argument of <limit>
-                strcat(expression,"\"");
-                strcat(expression,atb_read_value(atb_get(mytag,1))); // cat to the expression the direction
-                strcat(expression,"\",");
-            }
-            log_to_console("tag","<limit>",0,line_cursor);
-        }
-        else if (atb_cmp(mytag,0,"derivative"))
-        {
-            strcat(expression,"deri(");
-            log_to_console("tag","<derivative>",0,line_cursor);
-        }
-        else if (atb_cmp(mytag,0,"integral"))
-        {
-            strcat(expression,"int(");
-            log_to_console("tag","<integral>",0,line_cursor);
-        }
-        else if (atb_cmp(mytag,0,"scale"))
-        {
-            strcat(expression,"sca(");            
-            log_to_console("tag","<scale>",0,line_cursor);
-        }
-        else if (atb_cmp(mytag,0,"nthRoot"))
-        {
-            strcat(expression,"nroot(");            
-            log_to_console("tag","<nthroot>",0,line_cursor);
-        }
-        
+        log_to_console("tag","<limit>",0,line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag,0,"derivative"))
+    {
+        strcat(expression,"deri(");
+        log_to_console("tag","<derivative>",0,line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag,0,"integral"))
+    {
+        strcat(expression,"int(");
+        log_to_console("tag","<integral>",0,line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag,0,"scale"))
+    {
+        strcat(expression,"sca(");            
+        log_to_console("tag","<scale>",0,line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag,0,"nthRoot"))
+    {
+        strcat(expression,"nroot(");            
+        log_to_console("tag","<nthroot>",0,line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag,0,"degree_op"))
+    {
+        strcat(expression,"degree(");            
+        log_to_console("tag","<degree_op>",0,line_cursor);
         read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
     }
     else // se não, é uma aplicação da forma. EX. V(3).
     {
         strcat(expression, "func(");
     }
+        
 
     while(!atb_cmp(mytag,0,"/apply")){ // espera tag de fechamento
 
@@ -259,7 +274,6 @@ int range_parser(char *file, int *pos, char *expression, int *line_cursor){
         read_tag(file,pos,mytag,line_cursor);
     }
 
-    strdel_last(expression,1); // remove ultima virgula colcoada
     strcat(expression,")"); // fecha expressão range
     log_to_console("/tag","</range>",0,line_cursor);
     return true;
@@ -662,7 +676,7 @@ int math_parser(char *file, int *pos, char *expression, int result_ref, resultsL
 }
 
 //text parser, write to expression the text read from the .xaml files in mathcad/Xaml processed to swap the placeholder's by the actual symbols and fields in the text field
-int text_parser(char *file, int *pos, char *expression, int result_ref, text_field **text_list, resultsList **resultslist_ref, int *line_cursor){
+int text_parser(char *file, int *pos, char *expression, int result_ref, text_field **text_list, resultsList **resultslist_ref, img_list **img_list_ref, int *line_cursor){
     allocate(mytag,tag);
     regions *myregions = NULL;
 
@@ -670,7 +684,7 @@ int text_parser(char *file, int *pos, char *expression, int result_ref, text_fie
     while(!atb_cmp(mytag,0,"/text")){ // read <text> body
 
         if(atb_cmp(mytag,0,"regions")){ // parse regions
-            if(parse_regions(file,pos,&myregions,mytag,text_list,resultslist_ref,line_cursor)!=true){
+            if(parse_regions(file,pos,&myregions,mytag,text_list,resultslist_ref,img_list_ref,line_cursor)!=true){
                 log_to_console("error","Erro ao processar tag <regions>",0,line_cursor);
                 return error;
             }
@@ -706,7 +720,7 @@ int text_parser(char *file, int *pos, char *expression, int result_ref, text_fie
 }
 
 //parser de region
-int parse_region(char *file, int *pos, region **region_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
+int parse_region(char *file, int *pos, region **region_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, img_list **img_list_ref, int *line_cursor){
     allocate(mytag,tag);
     allocate(myregion,region); // objeto a ser montado e devolvido
     read_tag(file, pos, mytag, line_cursor);
@@ -721,8 +735,10 @@ int parse_region(char *file, int *pos, region **region_obj, tag *header, text_fi
     }
     myregion->expression[0]='\0';
 
-    while(!atb_cmp(mytag, 0, "/region")){
-        if(strcmp(mytag->tag_arg[0],"math")==true){ // math tag
+    while(!atb_cmp(mytag, 0, "/region"))
+    {
+        if(atb_cmp(mytag,0,"math")) // MATH TAG
+        { 
             log_to_console("tag","<math>",0,line_cursor);
 
             strcpy(myregion->type,"math"); // save type
@@ -732,25 +748,61 @@ int parse_region(char *file, int *pos, region **region_obj, tag *header, text_fi
                 log_to_console("error","Erro ao processar tag <math>",myregion->region_id,line_cursor);
                 return error;
             }
-        }else if(strcmp(mytag->tag_arg[0],"text")==true){ // text tag
+
+            img_count_add(); // as math is a image field in rtf files, it must me counted
+        }
+        else if(atb_cmp(mytag,0,"text")) // TEXT TAG
+        { 
             log_to_console("tag","<text>",0,line_cursor);
 
             strcpy(myregion->type,"text"); // save type
             myregion->resultRef = atoi(atb_read_value(atb_get(header,1))); // pick the <region> caller "region-id", necessary to crossreference with xaml text
             
-            if(text_parser(file, pos, (char*)&myregion->expression, myregion->resultRef, text_list, resultlist_ref, line_cursor)!=true){
+            if(text_parser(file, pos, (char*)&myregion->expression, myregion->resultRef, text_list, resultlist_ref, img_list_ref, line_cursor)!=true){
                 log_to_console("error","Erro ao processar tag <text>",myregion->region_id,line_cursor);
                 return error;
             }
-        }else if(strcmp(mytag->tag_arg[0],"plot")==true){ // tipo plot
-            //ESCREVER
-            log_to_console("Missing","Escrever plot parser",0,line_cursor);
+
+        }
+        else if(atb_cmp(mytag,0,"plot")) // PLOT TAG
+        { 
+            img_count_add(); // as plot is a image field in rtf files, it must me counted, and before picking the image 
+
+            snprintf(myregion->expression,REGION_EXPRESSION_LEN_DEFAULT,"img(\"%s\")",img_get_path(img_list_ref,img_count_get()-1) ); // add the field img expression, "img_count_get()-1" because "img_count" counts how many, but the index starts in 0, so 9 images, the last one will be the 8 one
+
+            strcpy(myregion->type,"image"); // save type
+
             read_tag(file, pos, mytag, line_cursor);
-            while(!atb_cmp(mytag,0,"/plot")){
+            while(!atb_cmp(mytag,0,"/plot"))
                 read_tag(file, pos, mytag, line_cursor);
-            }
-        }else{
-            log_to_console("error","Nenhuma tag válida dentro da região encontrada!",0,line_cursor);
+        }
+        else if (atb_cmp(mytag,0,"chartComponent"))
+        {
+            img_count_add(); // as plot is a image field in rtf files, it must me counted, and before picking the image 
+
+            snprintf(myregion->expression,REGION_EXPRESSION_LEN_DEFAULT,"img(\"%s\")",img_get_path(img_list_ref,img_count_get()-1) ); // add the field img expression, "img_count_get()-1" because "img_count" counts how many, but the index starts in 0, so 9 images, the last one will be the 8 one
+
+            strcpy(myregion->type,"image"); // save type
+
+            read_tag(file, pos, mytag, line_cursor);
+            while(!atb_cmp(mytag,0,"/chartComponent"))
+                read_tag(file, pos, mytag, line_cursor);
+        }
+        else if (atb_cmp(mytag,0,"picture"))
+        {
+            img_count_add(); // as plot is a image field in rtf files, it must me counted, and before picking the image 
+
+            snprintf(myregion->expression,REGION_EXPRESSION_LEN_DEFAULT,"img(\"%s\")",img_get_path(img_list_ref,img_count_get()-1) ); // add the field img expression, "img_count_get()-1" because "img_count" counts how many, but the index starts in 0, so 9 images, the last one will be the 8 one
+
+            strcpy(myregion->type,"image"); // save type
+
+            read_tag(file, pos, mytag, line_cursor);
+            while(!atb_cmp(mytag,0,"/picture"))
+                read_tag(file, pos, mytag, line_cursor);
+        }
+        else
+        {
+            log_to_console("error","Nenhuma tag valida dentro da regiao",0,line_cursor);
             return error;
         }
          
@@ -763,7 +815,7 @@ int parse_region(char *file, int *pos, region **region_obj, tag *header, text_fi
 }
 
 //parser de regions
-int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
+int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, img_list **img_list_ref, int *line_cursor){
     int tag_counter=0;
     allocate(mytag,tag);// tag temporária
     region *myregion; // objeto a ser processado
@@ -778,7 +830,7 @@ int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, text
 
         log_to_console("tag","<region>",tag_counter,line_cursor);
 
-        if(parse_region(file, pos, &myregion, mytag, text_list, resultlist_ref, line_cursor)!=true){
+        if(parse_region(file, pos, &myregion, mytag, text_list, resultlist_ref, img_list_ref, line_cursor)!=true){
             return error;
         }
         
@@ -796,7 +848,7 @@ int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, text
 }
 
 //parser de worksheet.xml , regiões de expressões e avaliações, mas não cálculos numéricos
-int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
+int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, img_list **img_list_ref, int *line_cursor){
     int tag_counter; //contador de tags
     allocate(mytag,tag); // tag temporária
     regions *myregions; // objeto a ser processado, ponteiro para cabeça da lista regions
@@ -812,7 +864,7 @@ int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header
         log_to_console("tag","<regions>",tag_counter,line_cursor); // deu boa
         
         myregions=NULL;
-        if(parse_regions(file, pos, &myregions, mytag, text_list, resultlist_ref, line_cursor)!=true){ // realizar parse da regions e verificar se deu boa ou não
+        if(parse_regions(file, pos, &myregions, mytag, text_list, resultlist_ref, img_list_ref, line_cursor)!=true){ // realizar parse da regions e verificar se deu boa ou não
             return error;
         }
         
@@ -831,7 +883,7 @@ int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header
 }
 
 //parse do arquivo worksheet.xml
-worksheets *parse_worksheet_xml(char *file, int *pos, text_field **text_list, resultsList **resultlist_ref, int *line_cursor){
+worksheets *parse_worksheet_xml(char *file, int *pos, text_field **text_list, resultsList **resultlist_ref, img_list **img_list_ref, int *line_cursor){
     int tag_counter=0; // contador de tags
     allocate(mytag,tag);
     worksheet *myworksheet; // cria worksheet para ser armazenada posteriormente
@@ -844,7 +896,7 @@ worksheets *parse_worksheet_xml(char *file, int *pos, text_field **text_list, re
             
             log_to_console("tag","<worksheet>",tag_counter,line_cursor);
             // processa a tag, myworksheet retorna com tag e regions embutida
-            if(parse_worksheet(file, pos, &myworksheet, mytag, text_list, resultlist_ref, line_cursor)!=true){ // chama parse para tag worksheet e verifica se foi feita com sucesso
+            if(parse_worksheet(file, pos, &myworksheet, mytag, text_list, resultlist_ref, img_list_ref, line_cursor)!=true){ // chama parse para tag worksheet e verifica se foi feita com sucesso
                 return NULL;
             }
 

@@ -1,0 +1,1 @@
+@Start m2tex.exe -f youfile.mcdx -i -s yourscript.lua 
