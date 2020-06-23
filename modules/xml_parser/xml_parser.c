@@ -100,8 +100,13 @@ void read_tag(char *file, int *pos, tag *mytag, int *line_cursor){ // recebe pon
         //terminador
         mytag->tag_arg[mytag->argq][word]='\0';
         // verifica prefixos no nome da tag do tipo <ml:something> e muda para <something>, argq=0 indica o nome da tag
-        if(strstr(mytag->tag_arg[0],"ml:")!=NULL){ 
+        if(strstr(mytag->tag_arg[0],"ml:")!=NULL)
+        { 
             strcrop(mytag->tag_arg[0],"ml:");
+        }
+        else if(strstr(mytag->tag_arg[0],"pw:")!=NULL)
+        { 
+            strcrop(mytag->tag_arg[0],"pw:");
         }
         //aponta para catactere depois de ">"
         (*pos)++;

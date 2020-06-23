@@ -320,10 +320,12 @@ char *get_text_field(text_field **head, int id){
 
 //run trought the list printing entries
 void print_text_field(text_field **head){
+    char print_buffer[100];
     text_field *cursor = *head;
-    printf("!---------------Lista de textos----------------!\n");
+    log_to_console("msg","!---------------Lista de textos----------------!",0,0);
     while(cursor!=NULL){
-        printf("ID: %i , TEXTO: %s\n",cursor->id,cursor->text);
+        snprintf(print_buffer,100,"ID: %i , TEXTO: %s",cursor->id,cursor->text);
+        log_to_console("msg",print_buffer,0,0);
         cursor=cursor->next;
     }
 }
@@ -399,15 +401,17 @@ void img_modify(img_list **head, char *new_path, int pos){
 
 //runs trught the list printing it
 void img_print_list(img_list **head){
+    char print_buffer[100];
     img_list *cursor = *head;
     if(cursor == NULL)
         return;
 
     int i=0;
 
-    printf("----------- Lista de imagens -----------\n");
+    log_to_console("msg","----------- Lista de imagens -----------",0,0);
     while(cursor->next!=NULL){
-        printf("Imagem [%d] : %s\n",i,cursor->next);
+        snprintf(print_buffer,100,"Imagem [%d] : %s\n",i,cursor->path);
+        log_to_console("msg",print_buffer,0,0);
         i++;
         cursor = cursor->next;
     }

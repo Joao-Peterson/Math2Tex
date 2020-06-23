@@ -288,29 +288,31 @@ int id_parser(char *file, int *pos, char *expression, int *line_cursor){
      
     read_tag(file, pos, mytag, line_cursor); // lê primeira tag dentro de <math>
 
-    while(!atb_cmp(mytag,0,"/id")){ // espera tag de fechamento
-        if(mytag->tag_type==TAG_TYPE_VALUE){ // se inicia com variavel(value), guardar ele
+    while(!atb_cmp(mytag,0,"/id"))  // espera tag de fechamento
+    {
+        if(mytag->tag_type==TAG_TYPE_VALUE) // se inicia com variavel(value), guardar ele
+        { 
             strcat(expression, "leg(\"");
             strcat(expression,atb_get(mytag,0)); // copia variavel
             strcat(expression, "\",\" \",\" \")");
-        }else if(atb_cmp(mytag, 0, "Span")){ // senão, então esperamos uma tag <Span> que contem a variavel
+        }
+        else if(atb_cmp(mytag, 0, "Span")) // senão, então esperamos uma tag <Span> que contem a variavel
+        { 
             log_to_console("tag","<Span>",0,line_cursor);
               // necessário a cada leitura
             read_tag(file, pos, mytag, line_cursor); // lê de novo
-            while(!atb_cmp(mytag, 0, "/Span")){ // espera fechamento da tag
-                
+
+            while(!atb_cmp(mytag, 0, "/Span")) // espera fechamento da tag
+            {
                 // Valor da variavel 
-                if(mytag->tag_type!=TAG_TYPE_VALUE){ // espera uma variavel
-                    log_to_console("error","Variavel esperada",0,line_cursor);
-                return error;
+                if(mytag->tag_type==TAG_TYPE_VALUE) // espera uma variavel
+                {
+                    strcpy(var,atb_get(mytag,0)); // pega variavel
                 }
+                
 
-                strcpy(var,atb_get(mytag,0)); // pega variavel
-
-                // Subescrito
-                 
-                read_tag(file, pos, mytag, line_cursor);
-                if(atb_cmp(mytag, 0, "Subscript")){
+                if(atb_cmp(mytag, 0, "Subscript")) // Subescrito
+                {
                      
                     read_tag(file, pos, mytag, line_cursor);
                     while(!atb_cmp(mytag, 0, "/Subscript")){
@@ -324,9 +326,10 @@ int id_parser(char *file, int *pos, char *expression, int *line_cursor){
                         read_tag(file, pos, mytag, line_cursor);
                     }
                 }
-
-                // Superscrito
-                if(atb_cmp(mytag, 0, "Upperscript")){
+                
+                
+                if(atb_cmp(mytag, 0, "Upperscript")) // Superscrito
+                {
                      
                     read_tag(file, pos, mytag, line_cursor);
                     while(!atb_cmp(mytag, 0, "/Upperscript")){
@@ -340,18 +343,28 @@ int id_parser(char *file, int *pos, char *expression, int *line_cursor){
                         read_tag(file, pos, mytag, line_cursor);
                     }
                 }
+                
+                             
+                read_tag(file, pos, mytag, line_cursor);
+            }
 
                 strcat(expression, "leg(\""); // adiciona legenda a expressão
                 strcat(expression, var); // adiciona variavel
                 strcat(expression, "\",\""); // separação virgula
-                strcat(expression, subs); // adiciona variavel
-                strcat(expression, "\",\""); // separação virgula
-                strcat(expression, upper); // adiciona variavel
-                strcat(expression, "\")"); // fecha legenda
 
-                 
-                read_tag(file, pos, mytag, line_cursor);
-            }
+                if (subs[0]!='\0')
+                    strcat(expression, subs); // adiciona variavel
+                else
+                    strcat(expression," "); // adiciona espaço vazio
+                
+                strcat(expression, "\",\""); // separação virgula
+                
+                if (upper[0]!='\0')
+                    strcat(expression, upper); // adiciona variavel
+                else
+                    strcat(expression," "); // adiciona espaço vazio
+                
+                strcat(expression, "\")"); // fecha legenda
 
             log_to_console("/tag","</Span>",0,line_cursor);
         }else{

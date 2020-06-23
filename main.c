@@ -26,7 +26,7 @@
 
 void check_luaVmachine(lua_State *L, int ret){
     if(ret!=LUA_OK){
-        printf("[LUA] ERROR: %s\n",lua_tostring(L,-1));
+        log_to_console("lua_erro",lua_tostring(L,-1),0,0);
         lua_close(L);
         exit(1);
     }
@@ -50,7 +50,7 @@ int main(int argc, char **argv){
     int rtf_flag=0;
     console_log_disable();
 
-    while( (opt = getopt(argc, argv, ":f:is:o:hcv")) != -1 ){
+    while( (opt = getopt(argc, argv, ":f:is:o:hdcv")) != -1 ){
         switch (opt)
         {
         case 'f':
@@ -73,6 +73,9 @@ int main(int argc, char **argv){
             break;
         case 'h':
             help=1; // show help
+            break;
+        case 'd':
+            enable_log_file();
             break;
         case 'c':
             remove_files=0; // donot remove files
@@ -136,6 +139,7 @@ int main(int argc, char **argv){
     // Auxiliar string making buffer
     char *buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
     char *lua_file_cmd = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
+    char *lua_log_buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
     lua_file_cmd[0]='\0';
     buffer[0]='\0';
 
@@ -234,9 +238,7 @@ int main(int argc, char **argv){
             to the .tex file.
             */
 
-            if (is_console_log_enable()==1) // DEBUG PURPOSES
-                img_print_list(&my_img_list);
-
+            img_print_list(&my_img_list);
 
             int j=0;
 
@@ -273,16 +275,8 @@ int main(int argc, char **argv){
         text_list = extract_docs(buffer); // text parser
 
         if(text_list!=NULL){
-            if (is_console_log_enable()==1)
-                print_text_field(&text_list);
+            print_text_field(&text_list);
         }
-        else
-        {
-            //log_to_console("error","Erro ao processar documento .XamlPackage",0,&cursor);
-            //return error;
-        }
-        
-
 
         /* Result parser --------------------------------------------------------------------------------------------- */  
 
@@ -349,8 +343,8 @@ int main(int argc, char **argv){
             {
                 while(myregion.region_id!=-1) // myregion has -1 on regio_id if the region read doesnt exist, see get_region() on data_structure.c
                 {
-                    if (is_console_log_enable()==1)
-                        printf("Expressao [%d]: %s - Tipo: %s\n",z,myregion.expression,myregion.type); // for show
+                    snprintf(lua_log_buffer,REGION_EXPRESSION_LEN_DEFAULT,"Expressao [%d]: %s - Tipo: %s",z,myregion.expression,myregion.type); // for show
+                    log_to_console("lua",lua_log_buffer,0,0);
                     
                     snprintf(buffer,REGION_EXPRESSION_LEN_DEFAULT,"add_field(%s,\"%s\",fp)",myregion.expression,myregion.type); // lua command
                     check_luaVmachine(L,luaL_dostring(L, buffer)); // lua exec command

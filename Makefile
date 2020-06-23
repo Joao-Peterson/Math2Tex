@@ -9,7 +9,7 @@
 
 # Programa principal
 MAIN_EXE = m2tex
-VERSION = v1.0
+VERSION = v1.1
 
 # Compilador :
 CC = gcc

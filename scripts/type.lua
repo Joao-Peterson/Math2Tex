@@ -26,7 +26,7 @@ function sub(a,b)
 end
 
 function neg(a)
-    return "(-("..a.."))"
+    return "(-"..a..")"
 end
 
 function mul(a,b)
@@ -241,15 +241,16 @@ function leg(a,b,c)
     b = is_math_symbol(b);
     c = is_math_symbol(c);
 
-    if (b == " ") and (c ~= " ") then
-        return tostring(a).."^{"..tostring(c).."}"
-    elseif (b ~= " ") and (c == " ") then
-        return tostring(a).."_{"..tostring(b).."}"
-    elseif (b == " ") and (c == " ") then
-        return tostring(a)
-    else
-        return tostring(a).."_{"..tostring(b).."}".."^{"..tostring(c).."}"
+    expression = tostring(a)
+
+    if b ~= " " then
+        expression = expression.."_{"..tostring(b).."}"
     end
+    if c ~= " " then
+        expression = expression.."^{"..tostring(b).."}"
+    end
+
+    return expression
 end
 
 function parens(a)

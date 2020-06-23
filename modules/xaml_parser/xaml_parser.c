@@ -167,6 +167,8 @@ text_field *extract_docs(char *path){ //expects the xaml dir containing the pack
         return NULL;
     }
 
+    char print_buffer[100];
+
     struct dirent *entry=NULL;
     char entry_name[REL_PATH_LEN_MAX]={0};
     char entry_name_id[REL_PATH_LEN_MAX]={0};
@@ -178,8 +180,8 @@ text_field *extract_docs(char *path){ //expects the xaml dir containing the pack
         snprintf(entry_name,REL_PATH_LEN_MAX,"%s/%s",path,entry->d_name); // path to file
         strncpy(entry_name_id,entry_name,REL_PATH_LEN_MAX); // copy for later use 
 
-        if(is_console_log_enable()==1)
-            printf(">> %s\n",entry->d_name); // just for show
+        snprintf(print_buffer,100,">> %s",entry->d_name); // just for show
+        log_to_console("msg",print_buffer,0,0);
         
         if(strstr(entry_name,".XamlPackage")!=NULL){ // if it is a package file
             strcrop(entry_name_id,".XamlPackage"); // cut the file extension, so it will be the directory to unzip
