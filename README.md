@@ -8,11 +8,11 @@ O programa tem em mente que o usuário faça uma folha de cálculo mathcad, salv
 
 O script pode ser editado em lua e contém definições de como cada operação interna deve ser interpretada. Essas operações internas ou espressões intermediárias são definidas no arquivo [function_def.txt](./function_def) disponível no repositório acima. Explicação mais a funda pendente...
 
-O programa foi escrito em C com o uso de duas bibliotecas, [zuba--/zip](https://github.com/kuba--/zip) disponível no github, usada para descompactação programática dos arquivos e biblioteca [lua 5.3](http://www.lua.org/), domínio público licenciada. Foi compilado estáticamente e por isso é portátil.
+O programa foi escrito em C com o uso de duas bibliotecas, [kuba--/zip](https://github.com/kuba--/zip) disponível no github, usada para descompactação programática dos arquivos e biblioteca [lua 5.3](http://www.lua.org/), domínio público licenciada. Foi compilado estáticamente e por isso é portátil.
 
 # Downloads
 
-[Clique aqui para downloads!](https://github.com/Joao-Peterson/Math2Tex/releases)
+[Clique aqui para ultima versão!](https://github.com/Joao-Peterson/Math2Tex/releases/latest)
 
 Na aba do github "Releases" há em cada versão, mais abaixo, uma caixa de nome assets como um arquivo, ".tar.gz", compactado que pode ser baixado e descompactado com o programa pré compilado e pronto para uso.
 
@@ -42,7 +42,7 @@ Deseja se que duas folhas de cálculo gerem um arquivo de saída com uso de imag
 
 Onde o diretório e arquivo "scripts_latex/type.lua" são de escolha livre do usuário, bem como os nomes e diretório dos arquivos.
 
-Caso o processo acima seja repetitivo demais ao longo da criação e salvamento de documentos, é indicado o uso de um arquivo ".bat" como incluido com o pacote de releases [_RUN_M2TEX_.bat](./scripts/_RUN_M2TEX_.bat), onde escrevendo as opções desejadas na linha de texto, pode se invocar o comando com dois cliques sobre o arquivo.
+Caso o processo acima seja repetitivo demais ao longo da criação e salvamento de documentos, é indicado o uso de um arquivo ".bat" como incluido com o pacote de releases [RUN_M2TEX.bat](./scripts/_RUN_M2TEX_.bat), onde escrevendo as opções desejadas na linha de texto, pode se invocar o comando com dois cliques sobre o arquivo.
 
 ### Script
 

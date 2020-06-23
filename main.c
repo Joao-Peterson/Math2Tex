@@ -106,6 +106,7 @@ int main(int argc, char **argv){
         printf("\t-i: indica que se espera um arquivo de mesmo nome que o arquivo de netrada mas salvo como .rtf,\n\t o qual sera usado para extrair as imagens.\n");
         printf("\t-s: nome de um arquivo script lua para ser usado na geracao do latex.\n");
         printf("\t-o: nome do arquiuvo de saida unico, caso nao especificado, cada arquivo de entrada vira um arquivo de saida separado.\n");
+        printf("\t-d: modo de debug, cria um arquivo log de saída que pode dar maiores informacoes ao utilizador e desenvolvedor.\n");
         printf("\t-v: o programa produzira um log de saida na linha de comando mostrando o processo.\n");
         printf("\t-c: quando o programa terminar os diretorios temporarios usados para processamento nao serao deletados.\n");
         printf("\n");
