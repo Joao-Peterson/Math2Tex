@@ -903,6 +903,8 @@ worksheets *parse_worksheet_xml(char *file, int *pos, text_field **text_list, re
     worksheets *worksheets_tmp = NULL; // objeto a ser montado e devolvido
     read_tag(file, pos, mytag, line_cursor); // lê primeira tag
 
+    img_counter_zero(); // zera contagem de imagens a cada worksheet lido
+
     while(!atb_cmp(mytag, 0, "the_end")){ // verifica fim do arquivo
         //verifica se é a tag esperada
         if(atb_cmp(mytag,0,"worksheet")){ // verifica se é tipo worksheet

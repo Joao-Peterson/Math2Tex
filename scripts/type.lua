@@ -9,6 +9,7 @@
 
 table = require("table")
 string = require("string")
+utf8 = require("utf8")
 
 --Váriaveis Globais
 
@@ -225,21 +226,33 @@ local symbols = {
     ["ν"] = "\\nu",
     ["Ψ"] = "\\psi",
     ["ψ"] = "\\Psi",
-    ["Χ"] = "\\chi"
+    ["Χ"] = "\\chi",
+    ["∓"] = "\\mp",
+	["±"] = "\\pm"
 }
 
-local function is_math_symbol(symb)
-    local check = string.find(symb,"[%∞%π%Π%Ω%ω%φ%ϕ%Φ%ξ%σ%Σ%α%ς%τ%ζ%β%γ%Γ%δ%Δ%ε%η%θ%Θ%κ%λ%Λ%ρ%ν%Ψ%ψ%Χ]")
-    if check ~= nil then
-        return symbols[symb]
+local function math_symbol_check(symb) -- check if there is characters in a string that contain characters present in the global table "symbols" and swap then by the latex string equivalent
+    local begin, ending  = string.find(symb,utf8.charpattern) -- search utf8 char
+
+    while (begin ~= nil) do
+        
+        local character = string.sub(symb,begin,ending)
+        
+        if ((ending-begin) >= 1) and (symbols[character] ~= nil) then -- if it is a non ascii utf8 char, byte len > 1, and if the symbol is not present in symbols table, then we dont want to substitute it by a latex string equivalent
+            symb = string.gsub(symb,character,symbols[character])
+        end
+
+        local cursor = ending + 1
+        begin,ending  = string.find(symb,utf8.charpattern,cursor) 
     end
+    
     return symb
 end
 
 function leg(a,b,c)
-    a = is_math_symbol(a);
-    b = is_math_symbol(b);
-    c = is_math_symbol(c);
+    a = math_symbol_check(a);
+    b = math_symbol_check(b);
+    c = math_symbol_check(c);
 
     expression = tostring(a)
 

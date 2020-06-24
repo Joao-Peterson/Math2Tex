@@ -49,6 +49,13 @@ resultsList *parser_results_xml(char *file, int *pos, int *line_cursor){
     read_tag(file,pos,mytag,line_cursor); // lê <resultsList>
     read_tag(file,pos,mytag,line_cursor); // lê primeira <resultData>
 
+    if (!atb_cmp(mytag,0,"resultData"))
+    {
+        resultslist_ref = malloc(sizeof(resultsList));
+        resultslist_ref->id=-1; // to indicate that there is none results to be read
+        return resultslist_ref;
+    }
+
     while(!atb_cmp(mytag,0,"/resultsList")){ // espera fechamento </resultsList>
         log_to_console("tag","<ResultData>",atoi(atb_read_value(atb_get(mytag,2))),line_cursor);
 

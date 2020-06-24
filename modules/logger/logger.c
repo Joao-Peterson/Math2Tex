@@ -56,6 +56,12 @@ void enable_log_file(){
 /* Log function  ------------------------------------------*/
 
 void log_to_console(const char *type, const char *msg, int id, int *line){
+    if (line==NULL) // if line argument is null
+    {
+        int line_tmp = 0;
+        line = &line_tmp;
+    }
+
     if (strcmp(type, "done") == 0)
     {
         if (console_flag_out == 1) // enables print
@@ -94,9 +100,9 @@ void log_to_console(const char *type, const char *msg, int id, int *line){
     else if (strcmp(type, "File") == 0)
     {
         if (console_flag_out == 1) // enables print
-            fprintf(stdout, "[File] - Arquivo lido com sucesso : %s - line %d \n", msg, *line);
+            fprintf(stdout, "[File] - Arquivo lido com sucesso : %s\n", msg);
         if (log_file_flag == 1 ) // enables lof file print
-            fprintf(log_file, "[File] - Arquivo lido com sucesso : %s - line %d \n", msg, *line);
+            fprintf(log_file, "[File] - Arquivo lido com sucesso : %s\n", msg);
     }
     else if (strcmp(type, "lua_erro") == 0)
     {

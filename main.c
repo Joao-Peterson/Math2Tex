@@ -141,6 +141,7 @@ int main(int argc, char **argv){
     char *buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
     char *lua_file_cmd = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
     char *lua_log_buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
+    char *log_buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
     lua_file_cmd[0]='\0';
     buffer[0]='\0';
 
@@ -165,6 +166,8 @@ int main(int argc, char **argv){
     int output_lock=0;
     region myregion;
     int x=0,y=0,z=0;
+
+    check_luaVmachine(L, luaL_dofile(L,script)); // open script once
 
     /* UNPACK AND PROCESS ALL FILES ---------------------------------------------------------------------------------------------------------------*/
 
@@ -260,9 +263,10 @@ int main(int argc, char **argv){
         rm_dir(unziped_path); // del recursivily last unpacked folder if it exist
         int file_status = zip_extract(files[i], unziped_path, on_extract_entry, NULL); // unpack
 
-        if (file_status<0) // check to see file consistency
+        if (file_status<0) // check to see file extract consistency
         {
-            log_to_console("error","Erro ao abrir arquivo: %s\n Certifique se que o arquivo existe e que se use a opcao \"-f\" seguida de apenas 1 arquivo\n",0,0);
+            snprintf(log_buffer,REGION_EXPRESSION_LEN_DEFAULT,"Erro ao abrir arquivo: %s\n Certifique se que o arquivo existe e que se use a opcao \"-f\" seguida de apenas 1 arquivo",files[i]);
+            log_to_console("error",log_buffer,0,0);
             exit(1);
         }
         
@@ -296,11 +300,20 @@ int main(int argc, char **argv){
         
         result_xml = parser_results_xml(input,&pos,&cursor); // results parser
 
-        if(result_xml==NULL){
+        if (result_xml->id==-1) // there's no results to be read
+        {
+            log_to_console("msg","Arquivo result.xml nao possui resultados",0,0);
+        }
+        else if(result_xml==NULL) // error reading file
+        {
             log_to_console("error","Erro ao processar arquivo result.xml",0,&cursor);
             return 0;
         }
-        log_to_console("done","Arquivo result.xml lido com sucesso",0,&cursor);
+        else
+        {
+            log_to_console("done","Arquivo result.xml lido com sucesso",0,&cursor);
+        }
+        
         free(input);
 
         /* Worksheet parser --------------------------------------------------------------------------------------------- */  
@@ -334,7 +347,6 @@ int main(int argc, char **argv){
 
         /* LUA CODE --------------------------------------------------- */
         
-        check_luaVmachine(L, luaL_dofile(L,script)); // open script
         check_luaVmachine(L, luaL_dostring(L,lua_file_cmd)); // open file
         
         myregion = get_region(worksheets_xml,x,y,z);
@@ -366,7 +378,9 @@ int main(int argc, char **argv){
         z=0;
         check_luaVmachine(L, luaL_dostring(L, "fp:close()"));
 
-
+        // file completion message
+        snprintf(lua_log_buffer,REGION_EXPRESSION_LEN_DEFAULT,"Arquivo \"%s\" lido com sucesso!",files[i]);
+        log_to_console("File",lua_log_buffer,0,0);
 
     } // for 
 

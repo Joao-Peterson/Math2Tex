@@ -16,4 +16,8 @@ test/
 
 *.mcdx
 
+*.log
+
+ex/
+
 tex_files/

@@ -13,10 +13,13 @@ img_list *extract_images(char *rtf_file, char *images_path){
 
     size_t filepath_size = strlen(images_path)+20; // +20 to acomodate the image filename after the image path folder
     char *image_filename_buffer = (char*)malloc(sizeof(char)*filepath_size); 
+    char log_buffer[REGION_EXPRESSION_LEN_DEFAULT]={0};
     char *input = read_asci(rtf_file);
+    
     if (input == NULL)
     {
-        printf("Ao usar a opção -i verificar se há salvo uma versão .rtf do seu arquivo .mcdx. Arquivo requerido: %s\n",rtf_file);
+        snprintf(log_buffer,REGION_EXPRESSION_LEN_DEFAULT,"Ao usar a opção -i verificar se há salvo uma versão .rtf do seu arquivo .mcdx. Arquivo requerido: %s\n",rtf_file);
+        log_to_console("msg",log_buffer,0,0);
         exit(1);
     }
 
@@ -49,7 +52,8 @@ img_list *extract_images(char *rtf_file, char *images_path){
 
         image_handle = fopen(image_filename_buffer,"w+b"); // open as binary to prevent windows end of line characaters modification, like "\n" = "\r\n"
         if (image_handle==NULL){
-            printf("Arquivo nao pode ser aberto: FILE[\"%s\"]",image_filename_buffer);
+            snprintf(log_buffer,REGION_EXPRESSION_LEN_DEFAULT,"Arquivo nao pode ser aberto: FILE[\"%s\"]",image_filename_buffer);
+            log_to_console("error",log_buffer,0,0);
             exit(1);
         }
 

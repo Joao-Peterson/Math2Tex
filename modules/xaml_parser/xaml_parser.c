@@ -162,12 +162,14 @@ int document_parser(char *filename, int id, text_field **head){
 
 text_field *extract_docs(char *path){ //expects the xaml dir containing the packages
     DIR *handle = opendir(path);
-    if(handle==NULL & is_console_log_enable()){
-        printf("Nao ha diretorio .Xaml\n");
+
+    char log_buffer[REGION_EXPRESSION_LEN_DEFAULT]={0};
+
+    if(handle==NULL){
+        snprintf(log_buffer,REGION_EXPRESSION_LEN_DEFAULT,"Nao ha diretorio .Xaml. Directorio: \"%s\"",path);
+        log_to_console("error",log_buffer,0,0);
         return NULL;
     }
-
-    char print_buffer[100];
 
     struct dirent *entry=NULL;
     char entry_name[REL_PATH_LEN_MAX]={0};
@@ -180,8 +182,8 @@ text_field *extract_docs(char *path){ //expects the xaml dir containing the pack
         snprintf(entry_name,REL_PATH_LEN_MAX,"%s/%s",path,entry->d_name); // path to file
         strncpy(entry_name_id,entry_name,REL_PATH_LEN_MAX); // copy for later use 
 
-        snprintf(print_buffer,100,">> %s",entry->d_name); // just for show
-        log_to_console("msg",print_buffer,0,0);
+        snprintf(log_buffer,REGION_EXPRESSION_LEN_DEFAULT,">> %s",entry->d_name); // just for show
+        log_to_console("msg",log_buffer,0,0);
         
         if(strstr(entry_name,".XamlPackage")!=NULL){ // if it is a package file
             strcrop(entry_name_id,".XamlPackage"); // cut the file extension, so it will be the directory to unzip
