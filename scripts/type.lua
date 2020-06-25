@@ -27,7 +27,7 @@ function sub(a,b)
 end
 
 function neg(a)
-    return "(-"..a..")"
+    return "-"..tostring(a)
 end
 
 function mul(a,b)
@@ -233,40 +233,40 @@ end
 -- Tabela e função para conversão de simbolos unicode para notação latex
 
 local symbols = {
-    ["∞"] = "\\infty",
-    ["π"] = "\\pi",
-    ["Π"] = "\\Pi",
-    ["Ω"] = "\\Omega",
-    ["ω"] = "\\omega",
-    ["φ"] = "\\phi",
-    ["ϕ"] = "\\varphi",
-    ["Φ"] = "\\Phi",
-    ["ξ"] = "\\xi",
-    ["σ"] = "\\sigma",
-    ["Σ"] = "\\Sigma",
-    ["α"] = "\\alpha",
-    ["ς"] = "\\varsigma",
-    ["τ"] = "\\tau",
-    ["ζ"] = "\\zeta",
-    ["β"] = "\\beta",
-    ["γ"] = "\\gamma",
-    ["Γ"] = "\\Gamma",
-    ["δ"] = "\\delta",
-    ["Δ"] = "\\Delta",
-    ["ε"] = "\\epsilon",
-    ["η"] = "\\eta",
-    ["θ"] = "\\theta",
-    ["Θ"] = "\\Theta",
-    ["κ"] = "\\kappa",
-    ["λ"] = "\\lambda",
-    ["Λ"] = "\\Lambda",
-    ["ρ"] = "\\rho",
-    ["ν"] = "\\nu",
-    ["Ψ"] = "\\psi",
-    ["ψ"] = "\\Psi",
-    ["Χ"] = "\\chi",
-    ["∓"] = "\\mp",
-	["±"] = "\\pm"
+    ["∞"] = "\\infty ",
+    ["π"] = "\\pi ",
+    ["Π"] = "\\Pi ",
+    ["Ω"] = "\\Omega ",
+    ["ω"] = "\\omega ",
+    ["φ"] = "\\phi ",
+    ["ϕ"] = "\\varphi ",
+    ["Φ"] = "\\Phi ",
+    ["ξ"] = "\\xi ",
+    ["σ"] = "\\sigma ",
+    ["Σ"] = "\\Sigma ",
+    ["α"] = "\\alpha ",
+    ["ς"] = "\\varsigma ",
+    ["τ"] = "\\tau ",
+    ["ζ"] = "\\zeta ",
+    ["β"] = "\\beta ",
+    ["γ"] = "\\gamma ",
+    ["Γ"] = "\\Gamma ",
+    ["δ"] = "\\delta ",
+    ["Δ"] = "\\Delta ",
+    ["ε"] = "\\epsilon ",
+    ["η"] = "\\eta ",
+    ["θ"] = "\\theta ",
+    ["Θ"] = "\\Theta ",
+    ["κ"] = "\\kappa ",
+    ["λ"] = "\\lambda ",
+    ["Λ"] = "\\Lambda ",
+    ["ρ"] = "\\rho ",
+    ["ν"] = "\\nu ",
+    ["Ψ"] = "\\psi ",
+    ["ψ"] = "\\Psi ",
+    ["Χ"] = "\\chi ",
+    ["∓"] = "\\mp ",
+	["±"] = "\\pm "
 }
 
 local function math_symbol_check(symb) -- check if there is characters in a string that contain characters present in the global table "symbols" and swap then by the latex string equivalent
@@ -368,7 +368,7 @@ function img(filename,title,source,label,scale)
         expression = [[
 \begin{figure}[h!]
     \centering
-    \caption
+    %\caption
     \includegraphics[_IMG_SCALE_]{_IMAGE_PATH_}
     
 \label{_LABEL_}

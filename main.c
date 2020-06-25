@@ -251,8 +251,8 @@ int main(int argc, char **argv){
             {
                 strcrop(tmp_path,filename_parent_get(output_file)); // crops off the parents directory of the .tex file off the *tmp_path, wich points to the path of the image in the list
                 if (tmp_path[0]=='/') // crops a residual "/" at the beginning of the path, just to make the filepath nicier
-                    tmp_path++;
-                    
+                    strcrop(tmp_path,"/");
+
                 j++;
             }
         }
