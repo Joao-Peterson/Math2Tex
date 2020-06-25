@@ -152,10 +152,64 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
         log_to_console("tag", "<pow>", 0, line_cursor);
         read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
     }
+    else if (atb_cmp(mytag, 0, "greaterThan"))
+    {
+        strcat(expression, "greaterThan(");
+        log_to_console("tag", "<greaterThan>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "greaterOrEqual"))
+    {
+        strcat(expression, "greaterOrEqual(");
+        log_to_console("tag", "<greaterOrEqual>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "lessThan"))
+    {
+        strcat(expression, "lessThan(");
+        log_to_console("tag", "<lessThan>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "lessOrEqual"))
+    {
+        strcat(expression, "lessOrEqual(");
+        log_to_console("tag", "<lessOrEqual>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
     else if (atb_cmp(mytag, 0, "equal"))
     {
         strcat(expression, "equal(");
         log_to_console("tag", "<equal>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "notEqual"))
+    {
+        strcat(expression, "notEqual(");
+        log_to_console("tag", "<notEqual>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "xor"))
+    {
+        strcat(expression, "f_xor(");
+        log_to_console("tag", "<xor>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "or"))
+    {
+        strcat(expression, "f_or(");
+        log_to_console("tag", "<or>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "and"))
+    {
+        strcat(expression, "f_and(");
+        log_to_console("tag", "<and>", 0, line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag, 0, "not"))
+    {
+        strcat(expression, "f_not(");
+        log_to_console("tag", "<not>", 0, line_cursor);
         read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
     }
     else if (atb_cmp(mytag, 0, "parens"))
@@ -428,69 +482,6 @@ int function_parser(char *file, int *pos, char *expression, int *line_cursor){
     return true;
 }
 
-//parser de symEval
-int symEval_parser(char *file, int *pos, char *expression, int *line_cursor){
-    allocate(mytag,tag);
-    read_tag(file,pos,mytag,line_cursor);
-
-    strcat(expression,"symb("); // abre expressão symb()
-
-    while (!atb_cmp(mytag,0,"/symEval"))
-    {
-        
-        if(atb_cmp(mytag,0,"command")){
-            
-            log_to_console("tag","<command>",0,line_cursor);
-            read_tag(file,pos,mytag,line_cursor);
-
-            while(!atb_cmp(mytag,0,"/command")){
-                
-                if(atb_cmp(mytag,0,"placeholder")){
-                    strcat(expression,EMPTY_ARG); // coloca espaço caso não houver texto da operação de avaliação simbólica
-                }else{
-                    if(type_parser(file,pos,mytag,expression,line_cursor)!=true){
-                        return error;
-                    }
-                }
-
-                read_tag(file,pos,mytag,line_cursor);
-            }
-
-            log_to_console("/tag","</command>",0,line_cursor);
-
-        }else if(atb_cmp(mytag,0,"symResult")){
-
-            log_to_console("tag","<symResult>",0,line_cursor);
-            read_tag(file,pos,mytag,line_cursor);
-
-            while (!atb_cmp(mytag,0,"/symResult")){
-                
-                if(type_parser(file,pos,mytag,expression,line_cursor)!=true){ // identitifica tipo genérico
-                    return error;
-                }
-
-                read_tag(file,pos,mytag,line_cursor);
-            }
-            
-        }else{
-
-            if(type_parser(file,pos,mytag,expression,line_cursor)!=true){ // identitifica tipo genérico
-                return error;
-            }
-
-        }
-
-        strcat(expression,","); // separador
-        read_tag(file,pos,mytag,line_cursor);
-    }
-
-    strdel_last(expression,1); // tira ultima virgula posta
-    strcat(expression,")"); // fecha expressão symb()    
-
-    log_to_console("/tag","</symEval>",0,line_cursor);
-    return true;
-}
-
 //parser do tipo lambda
 int lambda_parser(char *file, int *pos, char *expression, int *line_cursor){
     allocate(mytag,tag);
@@ -597,79 +588,193 @@ int type_parser(char *file, int *pos, tag *ref_tag, char *expression, int *line_
     return true;
 }
 
+//parser de symEval
+int symEval_parser(char *file, int *pos, char *expression, int *line_cursor){
+    allocate(mytag,tag);
+    read_tag(file,pos,mytag,line_cursor);
+
+    strcat(expression,"symb("); // abre expressão symb()
+
+    while (!atb_cmp(mytag,0,"/symEval"))
+    {
+        
+        if(atb_cmp(mytag,0,"command"))
+        {
+            
+            log_to_console("tag","<command>",0,line_cursor);
+            read_tag(file,pos,mytag,line_cursor);
+
+            while(!atb_cmp(mytag,0,"/command")){
+                
+                if(atb_cmp(mytag,0,"placeholder")){
+                    strcat(expression,EMPTY_ARG); // coloca espaço caso não houver texto da operação de avaliação simbólica
+                }else{
+                    if(type_parser(file,pos,mytag,expression,line_cursor)!=true){
+                        return error;
+                    }
+                }
+
+                read_tag(file,pos,mytag,line_cursor);
+            }
+
+            log_to_console("/tag","</command>",0,line_cursor);
+
+        }
+        else if(atb_cmp(mytag,0,"symResult"))
+        {
+
+            log_to_console("tag","<symResult>",0,line_cursor);
+            read_tag(file,pos,mytag,line_cursor);
+
+            while (!atb_cmp(mytag,0,"/symResult")){
+                
+                if(type_parser(file,pos,mytag,expression,line_cursor)!=true){ // identitifica tipo genérico
+                    return error;
+                }
+
+                read_tag(file,pos,mytag,line_cursor);
+            }
+            
+        }
+        else
+        {
+
+            if(type_parser(file,pos,mytag,expression,line_cursor)!=true){ // identitifica tipo genérico
+                return error;
+            }
+
+        }
+
+        strcat(expression,","); // separador
+        read_tag(file,pos,mytag,line_cursor);
+    }
+
+    strdel_last(expression,1); // tira ultima virgula posta
+    strcat(expression,")"); // fecha expressão symb()    
+
+    log_to_console("/tag","</symEval>",0,line_cursor);
+    return true;
+}
+
+// define parser
+int define_parser(char *file, int *pos, char *expression, int result_ref, resultsList **resultlist_ref, int *line_cursor){
+    allocate(mytag,tag);
+
+    log_to_console("tag","<define>",0,line_cursor);
+            
+    strcat(expression,"def("); // adiciona abertura de definição à expressão, strcpy pois é primeiro argumento da expressão
+    
+    read_tag(file, pos, mytag, line_cursor);
+    
+    while(!atb_cmp(mytag,0,"/define")){ // espera fechamento de <define>
+        
+        if(atb_cmp(mytag,0,"eval"))// tipo eval 
+        { 
+            
+            if (eval_parser(file,pos,expression,result_ref,resultlist_ref,line_cursor)==error){
+                log_to_console("error","Erro ao ler tag <eval>",0,0);
+                return error;
+            }
+           
+        }
+        else 
+        {
+            if (type_parser(file,pos,mytag,expression,line_cursor)!=true) // identitifica tipo genérico
+            { 
+                return error;
+            }
+        } 
+        
+        strcat(expression,","); // adiciona virgula após tipo
+            
+        read_tag(file, pos, mytag, line_cursor);
+    }
+
+    strdel_last(expression,1); // deleta ultima virgula 
+    strcat(expression,")"); // fecha definição
+
+    return true;
+}
+
+// eval parser
+int eval_parser(char *file, int *pos, char *expression, int result_ref, resultsList **resultlist_ref, int *line_cursor){
+    float evaluation_result = 0.0;
+    char evaluation_result_string[50];
+    allocate(mytag,tag);
+
+    log_to_console("tag","<eval>",0,line_cursor);
+
+    strcat(expression,"eval("); // abre expressão eval
+
+    read_tag(file,pos,mytag,line_cursor);
+
+    while(!atb_cmp(mytag,0,"/eval")){ // espera fechamento
+
+        if(atb_cmp(mytag,0,"unitOverride")){
+
+            log_to_console("tag","<unitOverride>",0,line_cursor);
+            read_tag(file,pos,mytag,line_cursor);
+
+            while(!atb_cmp(mytag,0,"/unitOverride")){
+                
+                if(atb_cmp(mytag,0,"placeholder")){ // resolve a tag para o valor correto
+                    evaluation_result = get_result(resultlist_ref,result_ref); // pega valor
+                    sprintf(evaluation_result_string,"\"%.15f\"",evaluation_result); // faz para string
+                    strcat(expression,evaluation_result_string); // concatena valor
+                }
+
+                read_tag(file,pos,mytag,line_cursor);
+            }
+
+            log_to_console("tag","</unitOverride>",0,line_cursor);
+
+        }
+        else if(atb_cmp(mytag,0,"define")) // tipo definição
+        { 
+            if (define_parser(file,pos,expression,result_ref,resultlist_ref,line_cursor)==error){
+                log_to_console("error","Erro ao ler tag <define>",0,0);
+                return error;
+            }
+        }
+        else
+        {
+            if(type_parser(file,pos,mytag,expression,line_cursor)!=true){ // identitifica tipo genérico
+                return error;
+            }
+        }
+
+        strcat(expression,","); // separador
+
+        read_tag(file,pos,mytag,line_cursor);
+    }
+
+    strdel_last(expression,1); // deletea ultima virgula posta
+    strcat(expression,")"); // fecha expressão eval
+
+    return true;
+}
+
 //parser de matemática
 int math_parser(char *file, int *pos, char *expression, int result_ref, resultsList **resultlist_ref, int *line_cursor){
     allocate(mytag,tag);
     read_tag(file, pos, mytag, line_cursor);
-    float evaluation_result;
-    char evaluation_result_string[50];
 
     while(!atb_cmp(mytag,0,"/math")){ // espera fechamento
 
         if(atb_cmp(mytag,0,"define")){ // tipo definição
 
-            log_to_console("tag","<define>",0,line_cursor);
-            
-            strcpy(expression,"def("); // adiciona abertura de definição à expressão, strcpy pois é primeiro argumento da expressão
-            
-            read_tag(file, pos, mytag, line_cursor);
-            
-            while(!atb_cmp(mytag,0,"/define")){ // espera fechamento de <define>
-                
-                if(type_parser(file,pos,mytag,expression,line_cursor)!=true){ // identitifica tipo genérico
-                    return error;
-                }
-                
-                strcat(expression,","); // adiciona virgula após tipo
-                 
-                read_tag(file, pos, mytag, line_cursor);
+            if (define_parser(file,pos,expression,result_ref,resultlist_ref,line_cursor)==error){
+                log_to_console("error","Erro ao ler tag <define>",0,0);
+                return error;
             }
-
-            strdel_last(expression,1); // deleta ultima virgula 
-            strcat(expression,")"); // fecha definição
 
         }else if(atb_cmp(mytag,0,"eval")){ // tipo eval 
             
-            log_to_console("tag","<eval>",0,line_cursor);
-
-            strcpy(expression,"eval("); // abre expressão eval
-
-            read_tag(file,pos,mytag,line_cursor);
-
-            while(!atb_cmp(mytag,0,"/eval")){ // espera fechamento
-
-                if(atb_cmp(mytag,0,"unitOverride")){
-
-                    log_to_console("tag","<unitOverride>",0,line_cursor);
-                    read_tag(file,pos,mytag,line_cursor);
-
-                    while(!atb_cmp(mytag,0,"/unitOverride")){
-                        
-                        if(atb_cmp(mytag,0,"placeholder")){ // resolve a tag para o valor correto
-                            evaluation_result = get_result(resultlist_ref,result_ref); // pega valor
-                            sprintf(evaluation_result_string,"\"%.15f\"",evaluation_result); // faz para string
-                            strcat(expression,evaluation_result_string); // concatena valor
-                        }
-
-                        read_tag(file,pos,mytag,line_cursor);
-                    }
-
-                    log_to_console("tag","</unitOverride>",0,line_cursor);
-
-                }else{
-                    if(type_parser(file,pos,mytag,expression,line_cursor)!=true){ // identitifica tipo genérico
-                        return error;
-                    }
-                }
-
-                strcat(expression,","); // separador
-
-                read_tag(file,pos,mytag,line_cursor);
+            if (eval_parser(file,pos,expression,result_ref,resultlist_ref,line_cursor)==error){
+                log_to_console("error","Erro ao ler tag <eval>",0,0);
+                return error;
             }
-
-            strdel_last(expression,1); // deletea ultima virgula posta
-            strcat(expression,")"); // fecha expressão eval
-
+            
         }else if(atb_cmp(mytag,0,"resultFormat")){ // tag <resultFormat> com função desconhecida
             read_tag(file,pos,mytag,line_cursor);
             while(!atb_cmp(mytag,0,"/resultFormat")){
@@ -862,7 +967,7 @@ int parse_regions(char *file, int *pos, regions **regions_obj, tag *header, text
 
 //parser de worksheet.xml , regiões de expressões e avaliações, mas não cálculos numéricos
 int parse_worksheet(char *file, int *pos, worksheet **worksheet_obj, tag *header, text_field **text_list, resultsList **resultlist_ref, img_list **img_list_ref, int *line_cursor){
-    int tag_counter; //contador de tags
+    int tag_counter=0; //contador de tags
     allocate(mytag,tag); // tag temporária
     regions *myregions; // objeto a ser processado, ponteiro para cabeça da lista regions
     worksheet *worksheet_tmp = NULL; // objeto a ser alocado, montado e devolvido, ponteiro para 

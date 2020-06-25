@@ -70,6 +70,44 @@ function degree(a)
     return tostring(a).."^{\\circ}"
 end
 
+--OPERAÇÕES DE LÓGICA
+
+function greaterThan(a,b)
+    return tostring(a)..">"..tostring(b)
+end
+
+function greaterOrEqual(a,b)
+    return tostring(a).."\\geq"..tostring(b)
+end
+
+function lessThan(a,b)
+    return tostring(a).."<"..tostring(b)
+end
+
+function lessOrEqual(a,b)
+    return tostring(a).."\\leq"..tostring(b)
+end
+
+function notEqual(a,b)
+    return tostring(a).."\\neq"..tostring(b)
+end
+
+function f_or(a,b)
+    return tostring(a).."\\lor"..tostring(b)
+end
+
+function f_and(a,b)
+    return tostring(a).."\\land"..tostring(b)
+end
+
+function f_xor(a,b)
+    return tostring(a).."\\oplus"..tostring(b) 
+end
+
+function f_not(a)
+    return tostring(a).."\\lnot"
+end
+
 --OPERAÇÕES DE CÁLCULO
 
 function deri(in_relation_to,func,degree)

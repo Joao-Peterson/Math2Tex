@@ -11,6 +11,15 @@
 void stringdata2floatarray(char* expression1, char* expression2, char* expression3,  plotdata **plotdata_ref){
     float value_tmp[3];
 
+    // ATENÇÃO, REFAZER ESTA MERDA, A FUNÇÃO read_tag()  NÃO AGUENTA LER ESSES VETOR DO DJANHO DE 15000 LINHAS EM UM VETOR ALOCADO NA STACK
+    // ASSIM, REFAZER A read_tag OU ACHAR OUTRO JEITO DE FAZER, ASSIM, PARA EVITAR QUE ESSA FUNÇÃO RETORNE MERDA E QUITTAR O PROGRAMA, VERIFICASE SE 
+    // VETORES ESTÃO LIDOS, VERIFICANDO SE A EXPRESSÃO 2 NÃO É NULA, E SAINDO DA FUNÇÃO.
+    if(expression2[0]!='\0') 
+    {
+        add_plotdata(plotdata_ref,0,0,0);
+        return;
+    }
+
     while(1){
         if((*expression1)=='['){ // avança primeiro '['
             expression1++; 
@@ -42,7 +51,9 @@ resultsList *parser_results_xml(char *file, int *pos, int *line_cursor){
     int id_temp;
     char type_temp[25];
     float value_temp;
-    char temp_vector[3][TAG_ARG_LEN_DEFAULT];
+    char *temp_vector_1 = malloc(sizeof(*temp_vector_1)*DATA_POINTS_CHAR_MAX+1);
+    char *temp_vector_2 = malloc(sizeof(*temp_vector_2)*DATA_POINTS_CHAR_MAX+1);
+    char *temp_vector_3 = malloc(sizeof(*temp_vector_3)*DATA_POINTS_CHAR_MAX+1);
     int i=0; // contagem de vetores de valores
 
     read_tag(file,pos,mytag,line_cursor); // lê tag <xml> 
@@ -73,9 +84,22 @@ resultsList *parser_results_xml(char *file, int *pos, int *line_cursor){
                     log_to_console("tag","<result>",0,line_cursor);
                     strcpy(type_temp,"result");
                 }else if(mytag->tag_type==TAG_TYPE_VALUE){
-                    strcpy(temp_vector[i],atb_get(mytag,0));
-                    i++;
+                    switch (i)
+                    {
+                    case 0:
+                        strncpy(temp_vector_1,atb_get(mytag,0),DATA_POINTS_CHAR_MAX);
+                        break;
+                    case 1:
+                        strncpy(temp_vector_2,atb_get(mytag,0),DATA_POINTS_CHAR_MAX);
+                        break;
+                    case 2:
+                        strncpy(temp_vector_3,atb_get(mytag,0),DATA_POINTS_CHAR_MAX);
+                        break;
+                    default:
+                        break;
+                    }
 
+                    i++;
                 }
 
                 read_tag(file,pos,mytag,line_cursor); // a cada </resultData> cria novo nó de resultsList
@@ -83,7 +107,7 @@ resultsList *parser_results_xml(char *file, int *pos, int *line_cursor){
 
             i=0; // zera contagem de strings de valores lidos
             node=NULL; // null a cada conversão para forçar alocação mais adiante
-            stringdata2floatarray(temp_vector[0],temp_vector[1],temp_vector[2],&node); // converte e retorna vetor de floats organizado
+            stringdata2floatarray(temp_vector_1,temp_vector_2,temp_vector_3,&node); // converte e retorna vetor de floats organizado
             add_result(&resultslist_ref,id_temp,type_temp,node);
 
         }else{
@@ -93,6 +117,10 @@ resultsList *parser_results_xml(char *file, int *pos, int *line_cursor){
         
         read_tag(file,pos,mytag,line_cursor);
     }
+
+    free(temp_vector_1);
+    free(temp_vector_2);
+    free(temp_vector_3);
 
     return resultslist_ref;
 }

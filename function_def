@@ -5,6 +5,17 @@ equal;
 func;
 rang;
 
+greaterThan;
+greaterOrEqual;
+lessThan;
+lessOrEqual;
+equal;
+notEqual;
+xor;
+or;
+and;
+not;
+
 add; 
 sub;
 mul;
@@ -35,3 +46,6 @@ text; // text type
 para; // paragrapher
 
 img // image path
+
+    
+

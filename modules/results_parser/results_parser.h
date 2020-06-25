@@ -5,6 +5,8 @@
 #include "../logger/logger.h"
 #include "../data_structures/data_structures.h"
 
+#define DATA_POINTS_CHAR_MAX 50000
+
 /*Parsers------------------------------------------------------------------------*/
 
 void stringdata2floatarray(char* expression1, char* expression2, char* expression3,  plotdata **plotdata_ref);

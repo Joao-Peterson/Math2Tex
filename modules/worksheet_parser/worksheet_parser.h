@@ -37,13 +37,19 @@ int range_parser(char *file, int *pos, char *expression, int *line_cursor);
 int id_parser(char *file, int *pos, char *expression, int *line_cursor);
 
 //recebe arquivo vetor, pos para começar, endereço de vetor expressão para armazenar após processar e endereço de linha
-int symEval_parser(char *file, int *pos, char *expression, int *line_cursor);
-
-//recebe arquivo vetor, pos para começar, endereço de vetor expressão para armazenar após processar e endereço de linha
 int function_parser(char *file, int *pos, char *expression, int *line_cursor);
 
-////recebe arquivo vetor, pos para começar, endereço de vetor expressão para armazenar após processar e endereço de linha e processa diferentes tipos
+//recebe arquivo vetor, pos para começar, endereço de vetor expressão para armazenar após processar e endereço de linha e processa diferentes tipos
 int type_parser(char *file, int *pos, tag *ref_tag, char *expression, int *line_cursor);
+
+//recebe arquivo vetor, pos para começar, endereço de vetor expressão para armazenar após processar e endereço de linha
+int symEval_parser(char *file, int *pos, char *expression, int *line_cursor);
+
+// define parser
+int define_parser(char *file, int *pos, char *expression, int result_ref, resultsList **resultlist_ref, int *line_cursor);
+
+// eval parser
+int eval_parser(char *file, int *pos, char *expression, int result_ref, resultsList **resultlist_ref, int *line_cursor);
 
 //recebe arquivo vetor, pos para começar, endereço de vetor expressão para armazenar após processar e endereço de linha
 int math_parser(char *file, int *pos, char *expression, int result_ref, resultsList **resultlist_ref, int *line_cursor);
