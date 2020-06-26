@@ -1,11 +1,13 @@
 --FUNÇÕES DE CONFIGURAÇÃO DO USUÁRIO
 
 --Referências:
---http://www.malinc.se/math/latex/basiccodeen.php#:~:text=The%20code%20%5Ctimes%20is%20used,never%20be%20negative%20by%20definition.
---https://www.overleaf.com/learn/latex/Integrals,_sums_and_limits
---https://tex.stackexchange.com/questions/103988/rightarrow-with-text-above-it
---https://www.overleaf.com/learn/latex/lists
+--Operações básicas : http://www.malinc.se/math/latex/basiccodeen.php#:~:text=The%20code%20%5Ctimes%20is%20used,never%20be%20negative%20by%20definition.
+--Operadores de cálculo : https://www.overleaf.com/learn/latex/Integrals,_sums_and_limits
+--Setas : https://tex.stackexchange.com/questions/103988/rightarrow-with-text-above-it
+--Listas : https://www.overleaf.com/learn/latex/lists
 --Inclusão de arquivos .tex em outros : https://www.overleaf.com/learn/latex/Management_in_a_large_project#:~:text=The%20standard%20tools%20to%20insert,are%20%5Cinput%20and%20%5Cinclude%20.&text=Use%20this%20command%20in%20the,%5Cend%7Bdocument%7D%20).
+--Simbolos matematicos : https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols
+--Matrizes : https://pt.overleaf.com/learn/latex/Matrices
 
 table = require("table")
 string = require("string")
@@ -15,6 +17,7 @@ utf8 = require("utf8")
 
 Precision = 3 -- decimal places precision
 
+IMAGE_SCALE_STANDARD = "height=6cm" -- escala padrão de imagem
 
 --OPERAÇÕES MATEMÁTICAS BÁSICAS
 
@@ -159,26 +162,27 @@ function symb(...)
     symb_expression = ""
     n = select("#",...)
     arg = {...}
-    for i,v in ipairs(arg) do
-        if i==1 then
+    for i,v in ipairs(arg) do -- itera sobre valores dados
+        if i==1 then -- primeiro valor
             expression = tostring(v)
             --print(expression)
-        elseif i==n then
+        elseif i==n then -- ultimo valor
             end_expression = tostring(v)
             --print(end_expression)
-        elseif i==n-1 then
+        elseif i==n-1 then -- penultimo
             symb_expression = symb_expression..tostring(v)
-        else 
+        else -- intermediário
             symb_expression = symb_expression..tostring(v)..","
             --print(symb_expression)
         end
     end
 
     if symb_expression==" " then
+        --return expression.."\\rightarrow "..end_expression
         return expression.."="..end_expression
     else
-        return expression.."="..end_expression
-    end        
+        return expression.."\\xrightarrow{"..symb_expression.."} "..end_expression
+    end     
     -- expression é o lado direito da avaliação, symb_expression são os argumentos sob a seta, end_expression é o resultado da avaliação
 end
 
@@ -266,7 +270,13 @@ local symbols = {
     ["ψ"] = "\\Psi ",
     ["Χ"] = "\\chi ",
     ["∓"] = "\\mp ",
-	["±"] = "\\pm "
+    ["±"] = "\\pm ",
+    ["≈"] = "\\approx ",
+    ["≅"] = "\\cong ",
+    ["≃"] = "\\simeq ",
+    ["≡"] = "\\equiv ",
+    ["∝"] = "\\propto ",
+    ["∼"] = "\\sim "
 }
 
 local function math_symbol_check(symb) -- check if there is characters in a string that contain characters present in the global table "symbols" and swap then by the latex string equivalent
@@ -308,7 +318,38 @@ function parens(a)
     return "("..tostring(a)..")"
 end
 
+function mat(r,c,...)
+    n = select("#",...)
+    arg={...}
+    local rows = 0
+    local cols = 0
 
+    local expression = "\\begin{bmatrix}\n"
+    local row = ""
+
+    for i,v in pairs(arg) do -- each member
+        if cols == c-1 then
+            row = row..tostring(v)
+
+            if rows == r-1 then -- last row won't get the separator
+                row = row -- row sepearator
+            else
+                row = row.."\\\\" -- row sepearator
+            end
+
+            expression = expression..row.."\n" -- cat row to expression
+            row = "" -- clear row
+            cols=0
+            rows = rows + 1
+        else
+            row = row..tostring(v).." & " -- member separator
+            cols = cols + 1
+        end
+    end
+
+    local expression = expression.."\\begin{bmatrix}"
+    return expression
+end
 
 --DEFINIÇÕES DE TEXTO
 
@@ -353,8 +394,6 @@ function text(...)
 end
 
 --DEFINIÇÕES DE IMAGEM
-
-local IMAGE_SCALE_STANDARD = "height=4cm" -- escala padrão de imagem
 
 local img_ref = 0 -- conta quantas imagens foram usadas
                   -- se usa na geração de titulos e outros campos automáticos
