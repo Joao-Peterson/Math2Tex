@@ -13,6 +13,9 @@ int parser_generic(char *file, int *pos, char *tag_name, char *expression, int *
 //matrix parser
 int matrix_parser(char *file, int *pos, tag *header, char *expression, int *line_cursor);
 
+//imaginary number parser
+int imag_parser(char *file, int *pos, tag *header, char *expression, int *line_cursor);
+
 //recebe arquivo vetor, pos para começar, endereço de vetor expressão para armazenar após processar e endereço de linha
 int real_parser(char *file, int *pos, char *expression, int *line_cursor);
 

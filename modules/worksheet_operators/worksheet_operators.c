@@ -79,6 +79,38 @@ int matrix_parser(char *file, int *pos, tag *header, char *expression, int *line
     return true;
 }
 
+//imaginary number parser
+int imag_parser(char *file, int *pos, tag *header, char *expression, int *line_cursor){
+    allocate(mytag,tag);
+    read_tag(file,pos,mytag,line_cursor);
+
+    strcat(expression,"imag(");
+    strcat(expression,"\"");
+    strcat(expression,atb_read_value(atb_get(header,1))); // pick imaginary symbol
+    strcat(expression,"\",");
+
+    while(!atb_cmp(mytag,0,"/imag"))
+    {
+        if (mytag->tag_type==TAG_TYPE_VALUE)
+        {
+            strcat(expression,atb_get(mytag,0)); // pick the value
+        }
+        else{
+            if(type_parser(file,pos,mytag,expression,line_cursor)!=true)
+                return error;
+        } 
+
+        strcat(expression,","); // separator
+
+        read_tag(file,pos,mytag,line_cursor);
+    }
+
+    strdel_last(expression,1); // delete last comma
+    strcat(expression,")"); // closure
+
+    return true;
+}
+
 //parser de real
 int real_parser(char *file, int *pos, char *expression, int *line_cursor){
     allocate(mytag,tag);                
@@ -547,6 +579,12 @@ int type_parser(char *file, int *pos, tag *ref_tag, char *expression, int *line_
         log_to_console("tag","<real>",0,line_cursor);
         if(real_parser(file,pos,expression,line_cursor)!=true){
             log_to_console("error","Erro ao processar tag <real>",0,line_cursor);
+            return error;
+        }
+    }else if(atb_cmp(ref_tag,0,"imag")){ 
+        log_to_console("tag","<imag>",0,line_cursor);
+        if(imag_parser(file,pos,ref_tag,expression,line_cursor)!=true){
+            log_to_console("error","Erro ao processar tag <imag>",0,line_cursor);
             return error;
         }
     }else if(atb_cmp(ref_tag,0,"parens")){ 

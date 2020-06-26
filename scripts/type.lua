@@ -297,6 +297,10 @@ local function math_symbol_check(symb) -- check if there is characters in a stri
     return symb
 end
 
+function imag(a,b)
+    return tostring(b).."\\cdot "..tostring(a)
+end
+
 function leg(a,b,c)
     a = math_symbol_check(a);
     b = math_symbol_check(b);

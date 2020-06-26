@@ -43,6 +43,12 @@ char *atb_read_value(char *atb){
     int i=0;
     int word=0;
     char *buffer = (char *)malloc(sizeof(char)*ATRIBUTE_LEN_DEFAULT); // aloca espaço para string entre aspas do atributo
+    char *error_atb = malloc(sizeof(error_atb)*50); 
+    strncpy(error_atb,"atb_read_value() received NULL value",50);
+
+    if (atb==NULL)
+        return error_atb;
+
     while(atb[i]!='"'){ // acha primeria aspas
         i++;
     }
@@ -58,7 +64,11 @@ char *atb_read_value(char *atb){
 
 //lê um atributo inteiro de uma tag
 char *atb_get(tag *ref, int id){
-    return ref->tag_arg[id];
+    char *return_pointer=NULL;
+    if ((return_pointer=ref->tag_arg[id])==NULL)
+        return NULL;
+    else
+        return return_pointer;
 }
 
 //lê tag e armezna argumentos   
