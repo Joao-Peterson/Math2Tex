@@ -8,7 +8,7 @@
 #define REGIONS_QTDY_DEFAULT 20
 #define REGION_QTDY_DEFAULT 100
 #define REGION_TYPE_LEN_DEFAULT 25
-#define REGION_EXPRESSION_LEN_DEFAULT 1000
+#define REGION_EXPRESSION_LEN_DEFAULT 12000
 #define PATH_LENGTH_MAX 250
 
 /*Estruturas--------------------------------------------------------------------*/

@@ -108,6 +108,11 @@ resultsList *parser_results_xml(char *file, int *pos, int *line_cursor){
             i=0; // zera contagem de strings de valores lidos
             node=NULL; // null a cada conversão para forçar alocação mais adiante
             stringdata2floatarray(temp_vector_1,temp_vector_2,temp_vector_3,&node); // converte e retorna vetor de floats organizado
+            
+            temp_vector_1[0] = '\0';
+            temp_vector_2[0] = '\0';
+            temp_vector_3[0] = '\0';
+            
             add_result(&resultslist_ref,id_temp,type_temp,node);
 
         }else{

@@ -73,6 +73,14 @@ function degree(a)
     return tostring(a).."^{\\circ}"
 end
 
+function summation(var,expression,from,to)
+    return "\\sum\\limits_{"..tostring(var).."="..tostring(from).."}^{"..tostring(to).."} "..tostring(expression)
+end
+
+function convolution(a,b)
+    return tostring(a).."*"..tostring(b)
+end
+
 --OPERAÇÕES DE LÓGICA
 
 function greaterThan(a,b)

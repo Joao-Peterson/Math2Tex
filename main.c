@@ -138,10 +138,10 @@ int main(int argc, char **argv){
     /* Process each file ----------------------------------------------------------------------------------------------------------------------*/
 
     // Auxiliar string making buffer
-    char *buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
-    char *lua_file_cmd = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
-    char *lua_log_buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
-    char *log_buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT);
+    char *buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT + 100);
+    char *lua_file_cmd = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT + 100);
+    char *lua_log_buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT + 100);
+    char *log_buffer = (char*)malloc(sizeof(char)*REGION_EXPRESSION_LEN_DEFAULT + 100);
     lua_file_cmd[0]='\0';
     buffer[0]='\0';
 
@@ -356,10 +356,10 @@ int main(int argc, char **argv){
             {
                 while(myregion.region_id!=-1) // myregion has -1 on regio_id if the region read doesnt exist, see get_region() on data_structure.c
                 {
-                    snprintf(lua_log_buffer,REGION_EXPRESSION_LEN_DEFAULT,"Expressao [%d]: %s - Tipo: %s",z,myregion.expression,myregion.type); // for show
+                    snprintf(lua_log_buffer,REGION_EXPRESSION_LEN_DEFAULT + 31,"Expressao [%d]: %s - Tipo: %s",z,myregion.expression,myregion.type); // for show
                     log_to_console("lua",lua_log_buffer,0,0);
                     
-                    snprintf(buffer,REGION_EXPRESSION_LEN_DEFAULT,"add_field(%s,\"%s\",fp)",myregion.expression,myregion.type); // lua command
+                    snprintf(buffer,REGION_EXPRESSION_LEN_DEFAULT + 23 /*+23 to expression on the right*/ ,"add_field(%s,\"%s\",fp)",myregion.expression,myregion.type); // lua command
                     check_luaVmachine(L,luaL_dostring(L, buffer)); // lua exec command
                     z++; // next region
                     myregion = get_region(worksheets_xml,x,y,z);

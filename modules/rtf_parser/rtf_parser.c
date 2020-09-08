@@ -13,7 +13,8 @@ img_list *extract_images(char *rtf_file, char *images_path){
 
     size_t filepath_size = strlen(images_path)+20; // +20 to acomodate the image filename after the image path folder
     char *image_filename_buffer = (char*)malloc(sizeof(char)*filepath_size); 
-    char log_buffer[REGION_EXPRESSION_LEN_DEFAULT]={0};
+    char* log_buffer = malloc(REGION_EXPRESSION_LEN_DEFAULT);
+    log_buffer[0] = '\0';
     char *input = read_asci(rtf_file);
     
     if (input == NULL)

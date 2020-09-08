@@ -163,7 +163,7 @@ int document_parser(char *filename, int id, text_field **head){
 text_field *extract_docs(char *path){ //expects the xaml dir containing the packages
     DIR *handle = opendir(path);
 
-    char log_buffer[REGION_EXPRESSION_LEN_DEFAULT]={0};
+    char* log_buffer = malloc(REGION_EXPRESSION_LEN_DEFAULT);
 
     if(handle==NULL){
         snprintf(log_buffer,REGION_EXPRESSION_LEN_DEFAULT,"Nao ha diretorio .Xaml. Directorio: \"%s\"",path);

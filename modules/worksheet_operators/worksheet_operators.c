@@ -298,6 +298,18 @@ int apply_parser(char *file, int *pos, char *expression, int *line_cursor){
         log_to_console("tag","<integral>",0,line_cursor);
         read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
     }
+    else if (atb_cmp(mytag,0,"summation"))
+    {
+        strcat(expression,"summation(");
+        log_to_console("tag","<summation>",0,line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
+    else if (atb_cmp(mytag,0,"convolution"))
+    {
+        strcat(expression,"convolution(");
+        log_to_console("tag","<convolution>",0,line_cursor);
+        read_tag(file,pos,mytag,line_cursor); // lê nova tag após tag de operação matemática
+    }
     else if (atb_cmp(mytag,0,"scale"))
     {
         strcat(expression,"sca(");            

@@ -34,8 +34,7 @@ iinte;
 iiinte;
 oint;
 lim;
-sum;
-prod;
+summation;
 
 neg;
 leg; ;leg(V,s,u)

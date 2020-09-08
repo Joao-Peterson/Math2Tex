@@ -320,7 +320,7 @@ char *get_text_field(text_field **head, int id){
 
 //run trought the list printing entries
 void print_text_field(text_field **head){
-    char print_buffer[REGION_EXPRESSION_LEN_DEFAULT];
+    char* print_buffer = malloc(REGION_EXPRESSION_LEN_DEFAULT);
     text_field *cursor = *head;
     log_to_console("msg","!---------------Lista de textos----------------!",0,0);
     while(cursor!=NULL){
@@ -401,7 +401,7 @@ void img_modify(img_list **head, char *new_path, int pos){
 
 //runs trught the list printing it
 void img_print_list(img_list **head){
-    char print_buffer[REGION_EXPRESSION_LEN_DEFAULT];
+    char* print_buffer = malloc(REGION_EXPRESSION_LEN_DEFAULT);
     img_list *cursor = *head;
     if(cursor == NULL)
         return;
